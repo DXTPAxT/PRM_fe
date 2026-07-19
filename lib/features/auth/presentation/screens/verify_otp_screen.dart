@@ -27,7 +27,6 @@ class _VerifyOtpScreenState extends ConsumerState<VerifyOtpScreen> {
     final challenge = authState.otpChallenge;
     if (challenge != null) {
       _setChallenge(challenge);
-      if (challenge.debugOtp != null) _otpController.text = challenge.debugOtp!;
     }
   }
 
@@ -91,9 +90,6 @@ class _VerifyOtpScreenState extends ConsumerState<VerifyOtpScreen> {
       if (challenge != null && challenge != previous?.otpChallenge) {
         _identifierController.text = challenge.identifier;
         _setChallenge(challenge);
-        if (challenge.debugOtp != null) {
-          _otpController.text = challenge.debugOtp!;
-        }
       }
       if (next.status == AuthStatus.authenticated) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -159,13 +155,6 @@ class _VerifyOtpScreenState extends ConsumerState<VerifyOtpScreen> {
                     ? 'OTP phải gồm đúng 6 chữ số'
                     : null,
               ),
-              if (challenge?.debugOtp != null) ...[
-                const SizedBox(height: 12),
-                Text(
-                  'OTP môi trường phát triển: ${challenge!.debugOtp}',
-                  style: const TextStyle(color: Colors.orange),
-                ),
-              ],
               const SizedBox(height: 24),
               if (authState.isLoading)
                 const Center(child: CircularProgressIndicator())

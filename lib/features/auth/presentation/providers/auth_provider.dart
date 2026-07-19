@@ -97,11 +97,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
     String? email,
     String? phone,
   }) async {
-    final user = await _ref.read(authRepositoryProvider).updateProfile(
-      fullName: fullName,
-      email: email,
-      phone: phone,
-    );
+    final user = await _ref
+        .read(authRepositoryProvider)
+        .updateProfile(fullName: fullName, email: email, phone: phone);
     state = AuthState.authenticated(user);
     return user;
   }
@@ -110,10 +108,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
     required String currentPassword,
     required String newPassword,
   }) async {
-    await _ref.read(authRepositoryProvider).changePassword(
-      currentPassword: currentPassword,
-      newPassword: newPassword,
-    );
+    await _ref
+        .read(authRepositoryProvider)
+        .changePassword(
+          currentPassword: currentPassword,
+          newPassword: newPassword,
+        );
     // Backend revokes every refresh session after a password change.
     await logout();
   }
@@ -150,7 +150,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
         password: password,
       );
       state = AuthState.unauthenticated(
-        error: 'Mã OTP đã được gửi. Vui lòng xác thực tài khoản.',
         pendingIdentifier: challenge.identifier,
         otpChallenge: challenge,
       );
@@ -212,7 +211,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final forgotPasswordUseCase = _ref.read(forgotPasswordUseCaseProvider);
       await forgotPasswordUseCase(email: email);
       state = AuthState.unauthenticated(
-        error: 'OTP đã được gửi nếu thông tin tồn tại. Vui lòng kiểm tra email.',
+        error:
+            'OTP đã được gửi nếu thông tin tồn tại. Vui lòng kiểm tra email.',
         pendingIdentifier: email,
       );
     } catch (e) {

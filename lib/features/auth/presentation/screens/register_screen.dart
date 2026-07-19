@@ -45,9 +45,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     ref.listen<AuthState>(authProvider, (previous, next) {
       if (!mounted) return;
       if (next.otpChallenge != null && previous?.otpChallenge == null) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('OTP đã được gửi.')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('OTP đã được gửi. Vui lòng kiểm tra email.'),
+            backgroundColor: Colors.green,
+          ),
+        );
         context.go('/verify-otp');
       } else if (next.errorMessage != null &&
           next.errorMessage!.isNotEmpty &&
