@@ -1,6 +1,7 @@
 import '../../../../core/network/api_response.dart';
 import '../../../../core/network/dio_client.dart';
 import '../../../../shared/models/user.dart';
+import '../../../../shared/models/address.dart';
 import '../models/auth_models.dart';
 import '../models/otp_models.dart';
 
@@ -24,15 +25,74 @@ class AuthRemoteDataSource {
   }) async {
     final response = await _dioClient.patch(
       '/users/me',
-      data: {
-        'fullName': fullName,
-        'email': email,
-        'phone': phone,
-      },
+      data: {'fullName': fullName, 'email': email, 'phone': phone},
     );
     return ApiResponse<User>.fromJson(
       response.data as Map<String, dynamic>,
       (json) => User.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  Future<ApiResponse<List<Address>>> getAddresses() async {
+    final response = await _dioClient.get('/addresses');
+    return ApiResponse<List<Address>>.fromJson(
+      response.data as Map<String, dynamic>,
+      (json) => (json as List<dynamic>)
+          .map((item) => Address.fromJson(item as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  Future<ApiResponse<Address>> createAddress({
+    required String fullName,
+    required String phone,
+    required String detail,
+    required bool isDefault,
+  }) async {
+    final response = await _dioClient.post(
+      '/addresses',
+      data: {
+        'fullName': fullName,
+        'phone': phone,
+        'detail': detail,
+        'isDefault': isDefault,
+      },
+    );
+    return ApiResponse<Address>.fromJson(
+      response.data as Map<String, dynamic>,
+      (json) => Address.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  Future<ApiResponse<Address>> updateAddress({
+    required String id,
+    required String fullName,
+    required String phone,
+    required String detail,
+  }) async {
+    final response = await _dioClient.patch(
+      '/addresses/$id',
+      data: {'fullName': fullName, 'phone': phone, 'detail': detail},
+    );
+    return ApiResponse<Address>.fromJson(
+      response.data as Map<String, dynamic>,
+      (json) => Address.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  Future<ApiResponse<void>> deleteAddress(String id) async {
+    final response = await _dioClient.delete('/addresses/$id');
+    return ApiResponse<void>.fromJson(
+      response.data as Map<String, dynamic>,
+      (_) {},
+    );
+  }
+
+  Future<ApiResponse<Address>> setDefaultAddress(String id) async {
+    final response = await _dioClient.patch('/addresses/$id/default');
+    return ApiResponse<Address>.fromJson(
+      response.data as Map<String, dynamic>,
+      (json) => Address.fromJson(json as Map<String, dynamic>),
     );
   }
 
@@ -42,10 +102,7 @@ class AuthRemoteDataSource {
   }) async {
     final response = await _dioClient.patch(
       '/users/me/password',
-      data: {
-        'currentPassword': currentPassword,
-        'newPassword': newPassword,
-      },
+      data: {'currentPassword': currentPassword, 'newPassword': newPassword},
     );
     return ApiResponse<void>.fromJson(
       response.data as Map<String, dynamic>,

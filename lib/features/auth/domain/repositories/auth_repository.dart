@@ -1,9 +1,30 @@
 import '../../../../shared/models/user.dart';
+import '../../../../shared/models/address.dart';
 import '../../data/models/auth_models.dart';
 import '../../data/models/otp_models.dart';
 
 abstract class AuthRepository {
   Future<User> getCurrentUser();
+
+  Future<List<Address>> getAddresses();
+
+  Future<Address> createAddress({
+    required String fullName,
+    required String phone,
+    required String detail,
+    required bool isDefault,
+  });
+
+  Future<Address> updateAddress({
+    required String id,
+    required String fullName,
+    required String phone,
+    required String detail,
+  });
+
+  Future<void> deleteAddress({required String id});
+
+  Future<Address> setDefaultAddress({required String id});
 
   Future<User> updateProfile({
     required String fullName,

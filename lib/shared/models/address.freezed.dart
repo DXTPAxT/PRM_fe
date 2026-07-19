@@ -22,10 +22,12 @@ Address _$AddressFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$Address {
   String get id => throw _privateConstructorUsedError;
-  @JsonKey(name: 'user_id')
   String get userId => throw _privateConstructorUsedError;
-  String get detail => throw _privateConstructorUsedError;
+  String get fullName => throw _privateConstructorUsedError;
   String get phone => throw _privateConstructorUsedError;
+  String get detail => throw _privateConstructorUsedError;
+  bool get isDefault => throw _privateConstructorUsedError;
+  DateTime get createdAt => throw _privateConstructorUsedError;
 
   /// Serializes this Address to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -43,9 +45,12 @@ abstract class $AddressCopyWith<$Res> {
   @useResult
   $Res call({
     String id,
-    @JsonKey(name: 'user_id') String userId,
-    String detail,
+    String userId,
+    String fullName,
     String phone,
+    String detail,
+    bool isDefault,
+    DateTime createdAt,
   });
 }
 
@@ -66,8 +71,11 @@ class _$AddressCopyWithImpl<$Res, $Val extends Address>
   $Res call({
     Object? id = null,
     Object? userId = null,
-    Object? detail = null,
+    Object? fullName = null,
     Object? phone = null,
+    Object? detail = null,
+    Object? isDefault = null,
+    Object? createdAt = null,
   }) {
     return _then(
       _value.copyWith(
@@ -79,14 +87,26 @@ class _$AddressCopyWithImpl<$Res, $Val extends Address>
                 ? _value.userId
                 : userId // ignore: cast_nullable_to_non_nullable
                       as String,
-            detail: null == detail
-                ? _value.detail
-                : detail // ignore: cast_nullable_to_non_nullable
+            fullName: null == fullName
+                ? _value.fullName
+                : fullName // ignore: cast_nullable_to_non_nullable
                       as String,
             phone: null == phone
                 ? _value.phone
                 : phone // ignore: cast_nullable_to_non_nullable
                       as String,
+            detail: null == detail
+                ? _value.detail
+                : detail // ignore: cast_nullable_to_non_nullable
+                      as String,
+            isDefault: null == isDefault
+                ? _value.isDefault
+                : isDefault // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            createdAt: null == createdAt
+                ? _value.createdAt
+                : createdAt // ignore: cast_nullable_to_non_nullable
+                      as DateTime,
           )
           as $Val,
     );
@@ -103,9 +123,12 @@ abstract class _$$AddressImplCopyWith<$Res> implements $AddressCopyWith<$Res> {
   @useResult
   $Res call({
     String id,
-    @JsonKey(name: 'user_id') String userId,
-    String detail,
+    String userId,
+    String fullName,
     String phone,
+    String detail,
+    bool isDefault,
+    DateTime createdAt,
   });
 }
 
@@ -125,8 +148,11 @@ class __$$AddressImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? userId = null,
-    Object? detail = null,
+    Object? fullName = null,
     Object? phone = null,
+    Object? detail = null,
+    Object? isDefault = null,
+    Object? createdAt = null,
   }) {
     return _then(
       _$AddressImpl(
@@ -138,14 +164,26 @@ class __$$AddressImplCopyWithImpl<$Res>
             ? _value.userId
             : userId // ignore: cast_nullable_to_non_nullable
                   as String,
-        detail: null == detail
-            ? _value.detail
-            : detail // ignore: cast_nullable_to_non_nullable
+        fullName: null == fullName
+            ? _value.fullName
+            : fullName // ignore: cast_nullable_to_non_nullable
                   as String,
         phone: null == phone
             ? _value.phone
             : phone // ignore: cast_nullable_to_non_nullable
                   as String,
+        detail: null == detail
+            ? _value.detail
+            : detail // ignore: cast_nullable_to_non_nullable
+                  as String,
+        isDefault: null == isDefault
+            ? _value.isDefault
+            : isDefault // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        createdAt: null == createdAt
+            ? _value.createdAt
+            : createdAt // ignore: cast_nullable_to_non_nullable
+                  as DateTime,
       ),
     );
   }
@@ -156,9 +194,12 @@ class __$$AddressImplCopyWithImpl<$Res>
 class _$AddressImpl implements _Address {
   const _$AddressImpl({
     required this.id,
-    @JsonKey(name: 'user_id') required this.userId,
-    required this.detail,
+    required this.userId,
+    required this.fullName,
     required this.phone,
+    required this.detail,
+    required this.isDefault,
+    required this.createdAt,
   });
 
   factory _$AddressImpl.fromJson(Map<String, dynamic> json) =>
@@ -167,16 +208,21 @@ class _$AddressImpl implements _Address {
   @override
   final String id;
   @override
-  @JsonKey(name: 'user_id')
   final String userId;
+  @override
+  final String fullName;
+  @override
+  final String phone;
   @override
   final String detail;
   @override
-  final String phone;
+  final bool isDefault;
+  @override
+  final DateTime createdAt;
 
   @override
   String toString() {
-    return 'Address(id: $id, userId: $userId, detail: $detail, phone: $phone)';
+    return 'Address(id: $id, userId: $userId, fullName: $fullName, phone: $phone, detail: $detail, isDefault: $isDefault, createdAt: $createdAt)';
   }
 
   @override
@@ -186,13 +232,28 @@ class _$AddressImpl implements _Address {
             other is _$AddressImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.userId, userId) || other.userId == userId) &&
+            (identical(other.fullName, fullName) ||
+                other.fullName == fullName) &&
+            (identical(other.phone, phone) || other.phone == phone) &&
             (identical(other.detail, detail) || other.detail == detail) &&
-            (identical(other.phone, phone) || other.phone == phone));
+            (identical(other.isDefault, isDefault) ||
+                other.isDefault == isDefault) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, userId, detail, phone);
+  int get hashCode => Object.hash(
+    runtimeType,
+    id,
+    userId,
+    fullName,
+    phone,
+    detail,
+    isDefault,
+    createdAt,
+  );
 
   /// Create a copy of Address
   /// with the given fields replaced by the non-null parameter values.
@@ -211,9 +272,12 @@ class _$AddressImpl implements _Address {
 abstract class _Address implements Address {
   const factory _Address({
     required final String id,
-    @JsonKey(name: 'user_id') required final String userId,
-    required final String detail,
+    required final String userId,
+    required final String fullName,
     required final String phone,
+    required final String detail,
+    required final bool isDefault,
+    required final DateTime createdAt,
   }) = _$AddressImpl;
 
   factory _Address.fromJson(Map<String, dynamic> json) = _$AddressImpl.fromJson;
@@ -221,12 +285,17 @@ abstract class _Address implements Address {
   @override
   String get id;
   @override
-  @JsonKey(name: 'user_id')
   String get userId;
+  @override
+  String get fullName;
+  @override
+  String get phone;
   @override
   String get detail;
   @override
-  String get phone;
+  bool get isDefault;
+  @override
+  DateTime get createdAt;
 
   /// Create a copy of Address
   /// with the given fields replaced by the non-null parameter values.

@@ -9,15 +9,21 @@ part of 'address.dart';
 _$AddressImpl _$$AddressImplFromJson(Map<String, dynamic> json) =>
     _$AddressImpl(
       id: json['id'] as String,
-      userId: json['user_id'] as String,
-      detail: json['detail'] as String,
+      userId: json['userId'] as String,
+      fullName: json['fullName'] as String,
       phone: json['phone'] as String,
+      detail: json['detail'] as String,
+      isDefault: json['isDefault'] as bool,
+      createdAt: DateTime.parse(json['createdAt'] as String),
     );
 
 Map<String, dynamic> _$$AddressImplToJson(_$AddressImpl instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'user_id': instance.userId,
-      'detail': instance.detail,
+      'userId': instance.userId,
+      'fullName': instance.fullName,
       'phone': instance.phone,
+      'detail': instance.detail,
+      'isDefault': instance.isDefault,
+      'createdAt': instance.createdAt.toIso8601String(),
     };

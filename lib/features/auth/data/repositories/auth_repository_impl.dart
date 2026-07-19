@@ -1,4 +1,5 @@
 import '../../../../shared/models/user.dart';
+import '../../../../shared/models/address.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/auth_remote_data_source.dart';
 import '../models/auth_models.dart';
@@ -14,6 +15,62 @@ class AuthRepositoryImpl implements AuthRepository {
     final response = await _remoteDataSource.getCurrentUser();
     if (response.success && response.data != null) return response.data!;
     throw Exception(response.message ?? 'Không thể tải thông tin tài khoản.');
+  }
+
+  @override
+  Future<List<Address>> getAddresses() async {
+    final response = await _remoteDataSource.getAddresses();
+    if (response.success && response.data != null) return response.data!;
+    throw Exception(response.message ?? 'Không thể tải sổ địa chỉ.');
+  }
+
+  @override
+  Future<Address> createAddress({
+    required String fullName,
+    required String phone,
+    required String detail,
+    required bool isDefault,
+  }) async {
+    final response = await _remoteDataSource.createAddress(
+      fullName: fullName,
+      phone: phone,
+      detail: detail,
+      isDefault: isDefault,
+    );
+    if (response.success && response.data != null) return response.data!;
+    throw Exception(response.message ?? 'Thêm địa chỉ thất bại.');
+  }
+
+  @override
+  Future<Address> updateAddress({
+    required String id,
+    required String fullName,
+    required String phone,
+    required String detail,
+  }) async {
+    final response = await _remoteDataSource.updateAddress(
+      id: id,
+      fullName: fullName,
+      phone: phone,
+      detail: detail,
+    );
+    if (response.success && response.data != null) return response.data!;
+    throw Exception(response.message ?? 'Cập nhật địa chỉ thất bại.');
+  }
+
+  @override
+  Future<void> deleteAddress({required String id}) async {
+    final response = await _remoteDataSource.deleteAddress(id);
+    if (!response.success) {
+      throw Exception(response.message ?? 'Xóa địa chỉ thất bại.');
+    }
+  }
+
+  @override
+  Future<Address> setDefaultAddress({required String id}) async {
+    final response = await _remoteDataSource.setDefaultAddress(id);
+    if (response.success && response.data != null) return response.data!;
+    throw Exception(response.message ?? 'Đặt địa chỉ mặc định thất bại.');
   }
 
   @override

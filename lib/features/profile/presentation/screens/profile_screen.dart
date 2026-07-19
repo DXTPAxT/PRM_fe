@@ -67,15 +67,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     if (!_profileFormKey.currentState!.validate()) return;
     setState(() => _savingProfile = true);
     try {
-      final user = await ref.read(authProvider.notifier).updateProfile(
-        fullName: _fullNameController.text.trim(),
-        email: _emailController.text.trim().isEmpty
-            ? null
-            : _emailController.text.trim(),
-        phone: _phoneController.text.trim().isEmpty
-            ? null
-            : _phoneController.text.trim(),
-      );
+      final user = await ref
+          .read(authProvider.notifier)
+          .updateProfile(
+            fullName: _fullNameController.text.trim(),
+            email: _emailController.text.trim().isEmpty
+                ? null
+                : _emailController.text.trim(),
+            phone: _phoneController.text.trim().isEmpty
+                ? null
+                : _phoneController.text.trim(),
+          );
       _fillForm(user);
       if (mounted) _showMessage('Cập nhật hồ sơ thành công.');
     } catch (error) {
@@ -89,10 +91,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     if (!_passwordFormKey.currentState!.validate()) return;
     setState(() => _changingPassword = true);
     try {
-      await ref.read(authProvider.notifier).changePassword(
-        currentPassword: _currentPasswordController.text,
-        newPassword: _newPasswordController.text,
-      );
+      await ref
+          .read(authProvider.notifier)
+          .changePassword(
+            currentPassword: _currentPasswordController.text,
+            newPassword: _newPasswordController.text,
+          );
       if (mounted) {
         _showMessage('Đổi mật khẩu thành công. Vui lòng đăng nhập lại.');
         context.go('/login');
@@ -116,8 +120,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   String? _validateEmail(String? value) {
     final email = value?.trim() ?? '';
     if (email.isEmpty) return null;
-    return RegExp(r'^[\w.+-]+@([\w-]+\.)+[\w-]{2,}$')
-            .hasMatch(email)
+    return RegExp(r'^[\w.+-]+@([\w-]+\.)+[\w-]{2,}$').hasMatch(email)
         ? null
         : 'Email không hợp lệ';
   }
@@ -185,10 +188,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   Card(
                     child: Column(
                       children: [
-                        const ListTile(
-                          leading: Icon(Icons.location_on_outlined),
-                          title: Text('Sổ địa chỉ'),
-                          subtitle: Text('Quản lý địa chỉ giao hàng'),
+                        ListTile(
+                          leading: const Icon(Icons.location_on_outlined),
+                          title: const Text('Sổ địa chỉ'),
+                          subtitle: const Text('Quản lý địa chỉ giao hàng'),
+                          onTap: () => context.push('/addresses'),
                         ),
                         const Divider(height: 1),
                         ListTile(
