@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'product_image.dart';
 import 'product_variant.dart';
 
 part 'product.freezed.dart';
@@ -8,12 +9,20 @@ part 'product.g.dart';
 class Product with _$Product {
   const factory Product({
     required String id,
-    @JsonKey(name: 'category_id') required String categoryId,
+    required String categoryId,
+    @Default('') String categoryName,
     required String name,
-    @JsonKey(name: 'base_price') required double basePrice,
+    String? description,
+    required double basePrice,
     required String status,
+    String? thumbnailUrl,
+    @Default(0) double avgRating,
+    @Default(0) int reviewCount,
+    @Default([]) List<ProductImage> images,
     @Default([]) List<ProductVariant> variants,
+    DateTime? createdAt,
   }) = _Product;
 
-  factory Product.fromJson(Map<String, dynamic> json) => _$ProductFromJson(json);
+  factory Product.fromJson(Map<String, dynamic> json) =>
+      _$ProductFromJson(json);
 }

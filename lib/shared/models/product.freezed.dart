@@ -22,13 +22,18 @@ Product _$ProductFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$Product {
   String get id => throw _privateConstructorUsedError;
-  @JsonKey(name: 'category_id')
   String get categoryId => throw _privateConstructorUsedError;
+  String get categoryName => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
-  @JsonKey(name: 'base_price')
+  String? get description => throw _privateConstructorUsedError;
   double get basePrice => throw _privateConstructorUsedError;
   String get status => throw _privateConstructorUsedError;
+  String? get thumbnailUrl => throw _privateConstructorUsedError;
+  double get avgRating => throw _privateConstructorUsedError;
+  int get reviewCount => throw _privateConstructorUsedError;
+  List<ProductImage> get images => throw _privateConstructorUsedError;
   List<ProductVariant> get variants => throw _privateConstructorUsedError;
+  DateTime? get createdAt => throw _privateConstructorUsedError;
 
   /// Serializes this Product to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -46,11 +51,18 @@ abstract class $ProductCopyWith<$Res> {
   @useResult
   $Res call({
     String id,
-    @JsonKey(name: 'category_id') String categoryId,
+    String categoryId,
+    String categoryName,
     String name,
-    @JsonKey(name: 'base_price') double basePrice,
+    String? description,
+    double basePrice,
     String status,
+    String? thumbnailUrl,
+    double avgRating,
+    int reviewCount,
+    List<ProductImage> images,
     List<ProductVariant> variants,
+    DateTime? createdAt,
   });
 }
 
@@ -71,10 +83,17 @@ class _$ProductCopyWithImpl<$Res, $Val extends Product>
   $Res call({
     Object? id = null,
     Object? categoryId = null,
+    Object? categoryName = null,
     Object? name = null,
+    Object? description = freezed,
     Object? basePrice = null,
     Object? status = null,
+    Object? thumbnailUrl = freezed,
+    Object? avgRating = null,
+    Object? reviewCount = null,
+    Object? images = null,
     Object? variants = null,
+    Object? createdAt = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -86,10 +105,18 @@ class _$ProductCopyWithImpl<$Res, $Val extends Product>
                 ? _value.categoryId
                 : categoryId // ignore: cast_nullable_to_non_nullable
                       as String,
+            categoryName: null == categoryName
+                ? _value.categoryName
+                : categoryName // ignore: cast_nullable_to_non_nullable
+                      as String,
             name: null == name
                 ? _value.name
                 : name // ignore: cast_nullable_to_non_nullable
                       as String,
+            description: freezed == description
+                ? _value.description
+                : description // ignore: cast_nullable_to_non_nullable
+                      as String?,
             basePrice: null == basePrice
                 ? _value.basePrice
                 : basePrice // ignore: cast_nullable_to_non_nullable
@@ -98,10 +125,30 @@ class _$ProductCopyWithImpl<$Res, $Val extends Product>
                 ? _value.status
                 : status // ignore: cast_nullable_to_non_nullable
                       as String,
+            thumbnailUrl: freezed == thumbnailUrl
+                ? _value.thumbnailUrl
+                : thumbnailUrl // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            avgRating: null == avgRating
+                ? _value.avgRating
+                : avgRating // ignore: cast_nullable_to_non_nullable
+                      as double,
+            reviewCount: null == reviewCount
+                ? _value.reviewCount
+                : reviewCount // ignore: cast_nullable_to_non_nullable
+                      as int,
+            images: null == images
+                ? _value.images
+                : images // ignore: cast_nullable_to_non_nullable
+                      as List<ProductImage>,
             variants: null == variants
                 ? _value.variants
                 : variants // ignore: cast_nullable_to_non_nullable
                       as List<ProductVariant>,
+            createdAt: freezed == createdAt
+                ? _value.createdAt
+                : createdAt // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
           )
           as $Val,
     );
@@ -118,11 +165,18 @@ abstract class _$$ProductImplCopyWith<$Res> implements $ProductCopyWith<$Res> {
   @useResult
   $Res call({
     String id,
-    @JsonKey(name: 'category_id') String categoryId,
+    String categoryId,
+    String categoryName,
     String name,
-    @JsonKey(name: 'base_price') double basePrice,
+    String? description,
+    double basePrice,
     String status,
+    String? thumbnailUrl,
+    double avgRating,
+    int reviewCount,
+    List<ProductImage> images,
     List<ProductVariant> variants,
+    DateTime? createdAt,
   });
 }
 
@@ -142,10 +196,17 @@ class __$$ProductImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? categoryId = null,
+    Object? categoryName = null,
     Object? name = null,
+    Object? description = freezed,
     Object? basePrice = null,
     Object? status = null,
+    Object? thumbnailUrl = freezed,
+    Object? avgRating = null,
+    Object? reviewCount = null,
+    Object? images = null,
     Object? variants = null,
+    Object? createdAt = freezed,
   }) {
     return _then(
       _$ProductImpl(
@@ -157,10 +218,18 @@ class __$$ProductImplCopyWithImpl<$Res>
             ? _value.categoryId
             : categoryId // ignore: cast_nullable_to_non_nullable
                   as String,
+        categoryName: null == categoryName
+            ? _value.categoryName
+            : categoryName // ignore: cast_nullable_to_non_nullable
+                  as String,
         name: null == name
             ? _value.name
             : name // ignore: cast_nullable_to_non_nullable
                   as String,
+        description: freezed == description
+            ? _value.description
+            : description // ignore: cast_nullable_to_non_nullable
+                  as String?,
         basePrice: null == basePrice
             ? _value.basePrice
             : basePrice // ignore: cast_nullable_to_non_nullable
@@ -169,10 +238,30 @@ class __$$ProductImplCopyWithImpl<$Res>
             ? _value.status
             : status // ignore: cast_nullable_to_non_nullable
                   as String,
+        thumbnailUrl: freezed == thumbnailUrl
+            ? _value.thumbnailUrl
+            : thumbnailUrl // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        avgRating: null == avgRating
+            ? _value.avgRating
+            : avgRating // ignore: cast_nullable_to_non_nullable
+                  as double,
+        reviewCount: null == reviewCount
+            ? _value.reviewCount
+            : reviewCount // ignore: cast_nullable_to_non_nullable
+                  as int,
+        images: null == images
+            ? _value._images
+            : images // ignore: cast_nullable_to_non_nullable
+                  as List<ProductImage>,
         variants: null == variants
             ? _value._variants
             : variants // ignore: cast_nullable_to_non_nullable
                   as List<ProductVariant>,
+        createdAt: freezed == createdAt
+            ? _value.createdAt
+            : createdAt // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
       ),
     );
   }
@@ -183,12 +272,20 @@ class __$$ProductImplCopyWithImpl<$Res>
 class _$ProductImpl implements _Product {
   const _$ProductImpl({
     required this.id,
-    @JsonKey(name: 'category_id') required this.categoryId,
+    required this.categoryId,
+    this.categoryName = '',
     required this.name,
-    @JsonKey(name: 'base_price') required this.basePrice,
+    this.description,
+    required this.basePrice,
     required this.status,
+    this.thumbnailUrl,
+    this.avgRating = 0,
+    this.reviewCount = 0,
+    final List<ProductImage> images = const [],
     final List<ProductVariant> variants = const [],
-  }) : _variants = variants;
+    this.createdAt,
+  }) : _images = images,
+       _variants = variants;
 
   factory _$ProductImpl.fromJson(Map<String, dynamic> json) =>
       _$$ProductImplFromJson(json);
@@ -196,15 +293,35 @@ class _$ProductImpl implements _Product {
   @override
   final String id;
   @override
-  @JsonKey(name: 'category_id')
   final String categoryId;
+  @override
+  @JsonKey()
+  final String categoryName;
   @override
   final String name;
   @override
-  @JsonKey(name: 'base_price')
+  final String? description;
+  @override
   final double basePrice;
   @override
   final String status;
+  @override
+  final String? thumbnailUrl;
+  @override
+  @JsonKey()
+  final double avgRating;
+  @override
+  @JsonKey()
+  final int reviewCount;
+  final List<ProductImage> _images;
+  @override
+  @JsonKey()
+  List<ProductImage> get images {
+    if (_images is EqualUnmodifiableListView) return _images;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_images);
+  }
+
   final List<ProductVariant> _variants;
   @override
   @JsonKey()
@@ -215,8 +332,11 @@ class _$ProductImpl implements _Product {
   }
 
   @override
+  final DateTime? createdAt;
+
+  @override
   String toString() {
-    return 'Product(id: $id, categoryId: $categoryId, name: $name, basePrice: $basePrice, status: $status, variants: $variants)';
+    return 'Product(id: $id, categoryId: $categoryId, categoryName: $categoryName, name: $name, description: $description, basePrice: $basePrice, status: $status, thumbnailUrl: $thumbnailUrl, avgRating: $avgRating, reviewCount: $reviewCount, images: $images, variants: $variants, createdAt: $createdAt)';
   }
 
   @override
@@ -227,11 +347,24 @@ class _$ProductImpl implements _Product {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.categoryId, categoryId) ||
                 other.categoryId == categoryId) &&
+            (identical(other.categoryName, categoryName) ||
+                other.categoryName == categoryName) &&
             (identical(other.name, name) || other.name == name) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
             (identical(other.basePrice, basePrice) ||
                 other.basePrice == basePrice) &&
             (identical(other.status, status) || other.status == status) &&
-            const DeepCollectionEquality().equals(other._variants, _variants));
+            (identical(other.thumbnailUrl, thumbnailUrl) ||
+                other.thumbnailUrl == thumbnailUrl) &&
+            (identical(other.avgRating, avgRating) ||
+                other.avgRating == avgRating) &&
+            (identical(other.reviewCount, reviewCount) ||
+                other.reviewCount == reviewCount) &&
+            const DeepCollectionEquality().equals(other._images, _images) &&
+            const DeepCollectionEquality().equals(other._variants, _variants) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -240,10 +373,17 @@ class _$ProductImpl implements _Product {
     runtimeType,
     id,
     categoryId,
+    categoryName,
     name,
+    description,
     basePrice,
     status,
+    thumbnailUrl,
+    avgRating,
+    reviewCount,
+    const DeepCollectionEquality().hash(_images),
     const DeepCollectionEquality().hash(_variants),
+    createdAt,
   );
 
   /// Create a copy of Product
@@ -263,11 +403,18 @@ class _$ProductImpl implements _Product {
 abstract class _Product implements Product {
   const factory _Product({
     required final String id,
-    @JsonKey(name: 'category_id') required final String categoryId,
+    required final String categoryId,
+    final String categoryName,
     required final String name,
-    @JsonKey(name: 'base_price') required final double basePrice,
+    final String? description,
+    required final double basePrice,
     required final String status,
+    final String? thumbnailUrl,
+    final double avgRating,
+    final int reviewCount,
+    final List<ProductImage> images,
     final List<ProductVariant> variants,
+    final DateTime? createdAt,
   }) = _$ProductImpl;
 
   factory _Product.fromJson(Map<String, dynamic> json) = _$ProductImpl.fromJson;
@@ -275,17 +422,29 @@ abstract class _Product implements Product {
   @override
   String get id;
   @override
-  @JsonKey(name: 'category_id')
   String get categoryId;
+  @override
+  String get categoryName;
   @override
   String get name;
   @override
-  @JsonKey(name: 'base_price')
+  String? get description;
+  @override
   double get basePrice;
   @override
   String get status;
   @override
+  String? get thumbnailUrl;
+  @override
+  double get avgRating;
+  @override
+  int get reviewCount;
+  @override
+  List<ProductImage> get images;
+  @override
   List<ProductVariant> get variants;
+  @override
+  DateTime? get createdAt;
 
   /// Create a copy of Product
   /// with the given fields replaced by the non-null parameter values.

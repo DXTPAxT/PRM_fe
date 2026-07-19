@@ -22,12 +22,12 @@ Review _$ReviewFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$Review {
   String get id => throw _privateConstructorUsedError;
-  @JsonKey(name: 'user_id')
   String get userId => throw _privateConstructorUsedError;
-  @JsonKey(name: 'product_id')
+  String get userFullName => throw _privateConstructorUsedError;
   String get productId => throw _privateConstructorUsedError;
-  double get rating => throw _privateConstructorUsedError;
-  String get comment => throw _privateConstructorUsedError;
+  int get rating => throw _privateConstructorUsedError;
+  String? get comment => throw _privateConstructorUsedError;
+  DateTime? get createdAt => throw _privateConstructorUsedError;
 
   /// Serializes this Review to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -45,10 +45,12 @@ abstract class $ReviewCopyWith<$Res> {
   @useResult
   $Res call({
     String id,
-    @JsonKey(name: 'user_id') String userId,
-    @JsonKey(name: 'product_id') String productId,
-    double rating,
-    String comment,
+    String userId,
+    String userFullName,
+    String productId,
+    int rating,
+    String? comment,
+    DateTime? createdAt,
   });
 }
 
@@ -69,9 +71,11 @@ class _$ReviewCopyWithImpl<$Res, $Val extends Review>
   $Res call({
     Object? id = null,
     Object? userId = null,
+    Object? userFullName = null,
     Object? productId = null,
     Object? rating = null,
-    Object? comment = null,
+    Object? comment = freezed,
+    Object? createdAt = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -83,6 +87,10 @@ class _$ReviewCopyWithImpl<$Res, $Val extends Review>
                 ? _value.userId
                 : userId // ignore: cast_nullable_to_non_nullable
                       as String,
+            userFullName: null == userFullName
+                ? _value.userFullName
+                : userFullName // ignore: cast_nullable_to_non_nullable
+                      as String,
             productId: null == productId
                 ? _value.productId
                 : productId // ignore: cast_nullable_to_non_nullable
@@ -90,11 +98,15 @@ class _$ReviewCopyWithImpl<$Res, $Val extends Review>
             rating: null == rating
                 ? _value.rating
                 : rating // ignore: cast_nullable_to_non_nullable
-                      as double,
-            comment: null == comment
+                      as int,
+            comment: freezed == comment
                 ? _value.comment
                 : comment // ignore: cast_nullable_to_non_nullable
-                      as String,
+                      as String?,
+            createdAt: freezed == createdAt
+                ? _value.createdAt
+                : createdAt // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
           )
           as $Val,
     );
@@ -111,10 +123,12 @@ abstract class _$$ReviewImplCopyWith<$Res> implements $ReviewCopyWith<$Res> {
   @useResult
   $Res call({
     String id,
-    @JsonKey(name: 'user_id') String userId,
-    @JsonKey(name: 'product_id') String productId,
-    double rating,
-    String comment,
+    String userId,
+    String userFullName,
+    String productId,
+    int rating,
+    String? comment,
+    DateTime? createdAt,
   });
 }
 
@@ -134,9 +148,11 @@ class __$$ReviewImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? userId = null,
+    Object? userFullName = null,
     Object? productId = null,
     Object? rating = null,
-    Object? comment = null,
+    Object? comment = freezed,
+    Object? createdAt = freezed,
   }) {
     return _then(
       _$ReviewImpl(
@@ -148,6 +164,10 @@ class __$$ReviewImplCopyWithImpl<$Res>
             ? _value.userId
             : userId // ignore: cast_nullable_to_non_nullable
                   as String,
+        userFullName: null == userFullName
+            ? _value.userFullName
+            : userFullName // ignore: cast_nullable_to_non_nullable
+                  as String,
         productId: null == productId
             ? _value.productId
             : productId // ignore: cast_nullable_to_non_nullable
@@ -155,11 +175,15 @@ class __$$ReviewImplCopyWithImpl<$Res>
         rating: null == rating
             ? _value.rating
             : rating // ignore: cast_nullable_to_non_nullable
-                  as double,
-        comment: null == comment
+                  as int,
+        comment: freezed == comment
             ? _value.comment
             : comment // ignore: cast_nullable_to_non_nullable
-                  as String,
+                  as String?,
+        createdAt: freezed == createdAt
+            ? _value.createdAt
+            : createdAt // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
       ),
     );
   }
@@ -170,10 +194,12 @@ class __$$ReviewImplCopyWithImpl<$Res>
 class _$ReviewImpl implements _Review {
   const _$ReviewImpl({
     required this.id,
-    @JsonKey(name: 'user_id') required this.userId,
-    @JsonKey(name: 'product_id') required this.productId,
+    required this.userId,
+    this.userFullName = 'Người dùng',
+    required this.productId,
     required this.rating,
-    required this.comment,
+    this.comment,
+    this.createdAt,
   });
 
   factory _$ReviewImpl.fromJson(Map<String, dynamic> json) =>
@@ -182,19 +208,22 @@ class _$ReviewImpl implements _Review {
   @override
   final String id;
   @override
-  @JsonKey(name: 'user_id')
   final String userId;
   @override
-  @JsonKey(name: 'product_id')
+  @JsonKey()
+  final String userFullName;
+  @override
   final String productId;
   @override
-  final double rating;
+  final int rating;
   @override
-  final String comment;
+  final String? comment;
+  @override
+  final DateTime? createdAt;
 
   @override
   String toString() {
-    return 'Review(id: $id, userId: $userId, productId: $productId, rating: $rating, comment: $comment)';
+    return 'Review(id: $id, userId: $userId, userFullName: $userFullName, productId: $productId, rating: $rating, comment: $comment, createdAt: $createdAt)';
   }
 
   @override
@@ -204,16 +233,28 @@ class _$ReviewImpl implements _Review {
             other is _$ReviewImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.userId, userId) || other.userId == userId) &&
+            (identical(other.userFullName, userFullName) ||
+                other.userFullName == userFullName) &&
             (identical(other.productId, productId) ||
                 other.productId == productId) &&
             (identical(other.rating, rating) || other.rating == rating) &&
-            (identical(other.comment, comment) || other.comment == comment));
+            (identical(other.comment, comment) || other.comment == comment) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, userId, productId, rating, comment);
+  int get hashCode => Object.hash(
+    runtimeType,
+    id,
+    userId,
+    userFullName,
+    productId,
+    rating,
+    comment,
+    createdAt,
+  );
 
   /// Create a copy of Review
   /// with the given fields replaced by the non-null parameter values.
@@ -232,10 +273,12 @@ class _$ReviewImpl implements _Review {
 abstract class _Review implements Review {
   const factory _Review({
     required final String id,
-    @JsonKey(name: 'user_id') required final String userId,
-    @JsonKey(name: 'product_id') required final String productId,
-    required final double rating,
-    required final String comment,
+    required final String userId,
+    final String userFullName,
+    required final String productId,
+    required final int rating,
+    final String? comment,
+    final DateTime? createdAt,
   }) = _$ReviewImpl;
 
   factory _Review.fromJson(Map<String, dynamic> json) = _$ReviewImpl.fromJson;
@@ -243,15 +286,17 @@ abstract class _Review implements Review {
   @override
   String get id;
   @override
-  @JsonKey(name: 'user_id')
   String get userId;
   @override
-  @JsonKey(name: 'product_id')
+  String get userFullName;
+  @override
   String get productId;
   @override
-  double get rating;
+  int get rating;
   @override
-  String get comment;
+  String? get comment;
+  @override
+  DateTime? get createdAt;
 
   /// Create a copy of Review
   /// with the given fields replaced by the non-null parameter values.

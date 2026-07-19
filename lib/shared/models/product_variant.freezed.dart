@@ -22,12 +22,10 @@ ProductVariant _$ProductVariantFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$ProductVariant {
   String get id => throw _privateConstructorUsedError;
-  @JsonKey(name: 'product_id')
   String get productId => throw _privateConstructorUsedError;
   String get size => throw _privateConstructorUsedError;
   String get color => throw _privateConstructorUsedError;
   double get price => throw _privateConstructorUsedError;
-  @JsonKey(name: 'stock_qty')
   int get stockQty => throw _privateConstructorUsedError;
   String get sku => throw _privateConstructorUsedError;
 
@@ -50,11 +48,11 @@ abstract class $ProductVariantCopyWith<$Res> {
   @useResult
   $Res call({
     String id,
-    @JsonKey(name: 'product_id') String productId,
+    String productId,
     String size,
     String color,
     double price,
-    @JsonKey(name: 'stock_qty') int stockQty,
+    int stockQty,
     String sku,
   });
 }
@@ -129,11 +127,11 @@ abstract class _$$ProductVariantImplCopyWith<$Res>
   @useResult
   $Res call({
     String id,
-    @JsonKey(name: 'product_id') String productId,
+    String productId,
     String size,
     String color,
     double price,
-    @JsonKey(name: 'stock_qty') int stockQty,
+    int stockQty,
     String sku,
   });
 }
@@ -200,11 +198,11 @@ class __$$ProductVariantImplCopyWithImpl<$Res>
 class _$ProductVariantImpl implements _ProductVariant {
   const _$ProductVariantImpl({
     required this.id,
-    @JsonKey(name: 'product_id') required this.productId,
+    required this.productId,
     required this.size,
     required this.color,
     required this.price,
-    @JsonKey(name: 'stock_qty') required this.stockQty,
+    required this.stockQty,
     required this.sku,
   });
 
@@ -214,7 +212,6 @@ class _$ProductVariantImpl implements _ProductVariant {
   @override
   final String id;
   @override
-  @JsonKey(name: 'product_id')
   final String productId;
   @override
   final String size;
@@ -223,7 +220,6 @@ class _$ProductVariantImpl implements _ProductVariant {
   @override
   final double price;
   @override
-  @JsonKey(name: 'stock_qty')
   final int stockQty;
   @override
   final String sku;
@@ -282,11 +278,11 @@ class _$ProductVariantImpl implements _ProductVariant {
 abstract class _ProductVariant implements ProductVariant {
   const factory _ProductVariant({
     required final String id,
-    @JsonKey(name: 'product_id') required final String productId,
+    required final String productId,
     required final String size,
     required final String color,
     required final double price,
-    @JsonKey(name: 'stock_qty') required final int stockQty,
+    required final int stockQty,
     required final String sku,
   }) = _$ProductVariantImpl;
 
@@ -296,7 +292,6 @@ abstract class _ProductVariant implements ProductVariant {
   @override
   String get id;
   @override
-  @JsonKey(name: 'product_id')
   String get productId;
   @override
   String get size;
@@ -305,7 +300,6 @@ abstract class _ProductVariant implements ProductVariant {
   @override
   double get price;
   @override
-  @JsonKey(name: 'stock_qty')
   int get stockQty;
   @override
   String get sku;
