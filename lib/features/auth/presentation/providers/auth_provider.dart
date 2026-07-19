@@ -12,6 +12,7 @@ import '../../domain/usecases/register_usecase.dart';
 import '../../domain/usecases/forgot_password_usecase.dart';
 import '../../domain/usecases/verify_otp_usecase.dart';
 import '../../domain/usecases/reset_password_usecase.dart';
+import '../../domain/usecases/get_current_user_usecase.dart';
 
 enum AuthStatus {
   initial,
@@ -56,16 +57,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> checkInitialState() async {
     final token = await _secureStorage.getAccessToken();
     if (token != null && token.isNotEmpty) {
-      // Default placeholder user for initialization (in real app, fetch profile API)
-      state = AuthState.authenticated(
-        const User(
-          id: '1',
-          fullName: 'User Scaffold',
-          email: 'user@example.com',
-          phone: '0123456789',
-          role: 'customer',
-        ),
-      );
+      try {
+        final user = await _ref.read(getCurrentUserUseCaseProvider).call();
+        state = AuthState.authenticated(user);
+      } catch (_) {
+        await _secureStorage.clearTokens();
+        state = AuthState.unauthenticated();
+      }
     } else {
       state = AuthState.unauthenticated();
     }
@@ -205,6 +203,11 @@ final forgotPasswordUseCaseProvider = Provider<ForgotPasswordUseCase>((ref) {
 final resetPasswordUseCaseProvider = Provider<ResetPasswordUseCase>((ref) {
   final repository = ref.watch(authRepositoryProvider);
   return ResetPasswordUseCase(repository);
+});
+
+final getCurrentUserUseCaseProvider = Provider<GetCurrentUserUseCase>((ref) {
+  final repository = ref.watch(authRepositoryProvider);
+  return GetCurrentUserUseCase(repository);
 });
 
 // Auth Provider

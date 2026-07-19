@@ -1,4 +1,5 @@
 import '../../domain/repositories/auth_repository.dart';
+import '../../../../shared/models/user.dart';
 import '../datasources/auth_remote_data_source.dart';
 import '../models/auth_models.dart';
 
@@ -6,6 +7,15 @@ class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource _remoteDataSource;
 
   AuthRepositoryImpl(this._remoteDataSource);
+
+  @override
+  Future<User> getCurrentUser() async {
+    final response = await _remoteDataSource.getCurrentUser();
+    if (response.success && response.data != null) {
+      return response.data!;
+    }
+    throw Exception(response.message ?? 'Không thể tải thông tin tài khoản.');
+  }
 
   @override
   Future<AuthResponse> login({

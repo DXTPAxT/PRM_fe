@@ -1,6 +1,9 @@
 import '../../data/models/auth_models.dart';
+import '../../../../shared/models/user.dart';
 
 abstract class AuthRepository {
+  Future<User> getCurrentUser();
+
   Future<AuthResponse> login({
     required String email,
     required String password,
