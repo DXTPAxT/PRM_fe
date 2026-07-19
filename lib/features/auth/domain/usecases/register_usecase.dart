@@ -1,11 +1,12 @@
 import '../repositories/auth_repository.dart';
+import '../../data/models/otp_models.dart';
 
 class RegisterUseCase {
   final AuthRepository _repository;
 
   RegisterUseCase(this._repository);
 
-  Future<void> call({
+  Future<RegisterChallenge> call({
     required String fullName,
     required String email,
     required String phone,

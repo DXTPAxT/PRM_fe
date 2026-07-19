@@ -39,13 +39,13 @@ Map<String, dynamic> _$$RegisterRequestImplToJson(
 _$VerifyOtpRequestImpl _$$VerifyOtpRequestImplFromJson(
   Map<String, dynamic> json,
 ) => _$VerifyOtpRequestImpl(
-  email: json['email'] as String,
+  email: json['identifier'] as String,
   otp: json['otp'] as String,
 );
 
 Map<String, dynamic> _$$VerifyOtpRequestImplToJson(
   _$VerifyOtpRequestImpl instance,
-) => <String, dynamic>{'email': instance.email, 'otp': instance.otp};
+) => <String, dynamic>{'identifier': instance.email, 'otp': instance.otp};
 
 _$ForgotPasswordRequestImpl _$$ForgotPasswordRequestImplFromJson(
   Map<String, dynamic> json,

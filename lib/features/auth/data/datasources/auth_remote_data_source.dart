@@ -1,7 +1,8 @@
-import '../../../../core/network/dio_client.dart';
 import '../../../../core/network/api_response.dart';
+import '../../../../core/network/dio_client.dart';
 import '../../../../shared/models/user.dart';
 import '../models/auth_models.dart';
+import '../models/otp_models.dart';
 
 class AuthRemoteDataSource {
   final DioClient _dioClient;
@@ -27,18 +28,44 @@ class AuthRemoteDataSource {
     );
   }
 
-  Future<ApiResponse<void>> register(RegisterRequest request) async {
+  Future<ApiResponse<RegisterChallenge>> register(
+    RegisterRequest request,
+  ) async {
     final response = await _dioClient.post(
       '/auth/register',
       data: request.toJson(),
     );
-    return ApiResponse<void>.fromJson(
+    return ApiResponse<RegisterChallenge>.fromJson(
       response.data as Map<String, dynamic>,
-      (_) {},
+      (json) => RegisterChallenge.fromJson(json as Map<String, dynamic>),
     );
   }
 
-  Future<ApiResponse<void>> verifyOtp(VerifyOtpRequest request) async {
+  Future<ApiResponse<AuthResponse>> verifyOtp(VerifyOtpRequest request) async {
+    final response = await _dioClient.post(
+      '/auth/otp/verify',
+      data: request.toJson(),
+    );
+    return ApiResponse<AuthResponse>.fromJson(
+      response.data as Map<String, dynamic>,
+      (json) => AuthResponse.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  Future<ApiResponse<RegisterChallenge>> resendOtp(String identifier) async {
+    final response = await _dioClient.post(
+      '/auth/otp/resend',
+      data: {'identifier': identifier},
+    );
+    return ApiResponse<RegisterChallenge>.fromJson(
+      response.data as Map<String, dynamic>,
+      (json) => RegisterChallenge.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  Future<ApiResponse<void>> verifyForgotPasswordOtp(
+    VerifyOtpRequest request,
+  ) async {
     final response = await _dioClient.post(
       '/auth/otp/verify',
       data: request.toJson(),
@@ -49,7 +76,9 @@ class AuthRemoteDataSource {
     );
   }
 
-  Future<ApiResponse<void>> forgotPassword(ForgotPasswordRequest request) async {
+  Future<ApiResponse<void>> forgotPassword(
+    ForgotPasswordRequest request,
+  ) async {
     final response = await _dioClient.post(
       '/auth/forgot-password',
       data: request.toJson(),

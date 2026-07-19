@@ -1,7 +1,8 @@
-import '../../domain/repositories/auth_repository.dart';
 import '../../../../shared/models/user.dart';
+import '../../domain/repositories/auth_repository.dart';
 import '../datasources/auth_remote_data_source.dart';
 import '../models/auth_models.dart';
+import '../models/otp_models.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource _remoteDataSource;
@@ -11,9 +12,7 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<User> getCurrentUser() async {
     final response = await _remoteDataSource.getCurrentUser();
-    if (response.success && response.data != null) {
-      return response.data!;
-    }
+    if (response.success && response.data != null) return response.data!;
     throw Exception(response.message ?? 'Không thể tải thông tin tài khoản.');
   }
 
@@ -25,15 +24,12 @@ class AuthRepositoryImpl implements AuthRepository {
     final response = await _remoteDataSource.login(
       LoginRequest(email: email, password: password),
     );
-    if (response.success && response.data != null) {
-      return response.data!;
-    } else {
-      throw Exception(response.message ?? 'Đăng nhập thất bại.');
-    }
+    if (response.success && response.data != null) return response.data!;
+    throw Exception(response.message ?? 'Đăng nhập thất bại.');
   }
 
   @override
-  Future<void> register({
+  Future<RegisterChallenge> register({
     required String fullName,
     required String email,
     required String phone,
@@ -47,17 +43,35 @@ class AuthRepositoryImpl implements AuthRepository {
         password: password,
       ),
     );
-    if (!response.success) {
-      throw Exception(response.message ?? 'Đăng ký thất bại.');
-    }
+    if (response.success && response.data != null) return response.data!;
+    throw Exception(response.message ?? 'Đăng ký thất bại.');
   }
 
   @override
-  Future<void> verifyOtp({
+  Future<AuthResponse> verifyOtp({
     required String email,
     required String otp,
   }) async {
     final response = await _remoteDataSource.verifyOtp(
+      VerifyOtpRequest(email: email, otp: otp),
+    );
+    if (response.success && response.data != null) return response.data!;
+    throw Exception(response.message ?? 'Xác thực OTP thất bại.');
+  }
+
+  @override
+  Future<RegisterChallenge> resendOtp({required String identifier}) async {
+    final response = await _remoteDataSource.resendOtp(identifier);
+    if (response.success && response.data != null) return response.data!;
+    throw Exception(response.message ?? 'Gửi lại OTP thất bại.');
+  }
+
+  @override
+  Future<void> verifyOtpForPassword({
+    required String email,
+    required String otp,
+  }) async {
+    final response = await _remoteDataSource.verifyForgotPasswordOtp(
       VerifyOtpRequest(email: email, otp: otp),
     );
     if (!response.success) {
@@ -66,9 +80,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> forgotPassword({
-    required String email,
-  }) async {
+  Future<void> forgotPassword({required String email}) async {
     final response = await _remoteDataSource.forgotPassword(
       ForgotPasswordRequest(email: email),
     );
@@ -84,11 +96,7 @@ class AuthRepositoryImpl implements AuthRepository {
     required String newPassword,
   }) async {
     final response = await _remoteDataSource.resetPassword(
-      ResetPasswordRequest(
-        email: email,
-        otp: otp,
-        newPassword: newPassword,
-      ),
+      ResetPasswordRequest(email: email, otp: otp, newPassword: newPassword),
     );
     if (!response.success) {
       throw Exception(response.message ?? 'Đặt lại mật khẩu thất bại.');
