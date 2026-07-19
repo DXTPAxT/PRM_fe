@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/common_widgets.dart';
@@ -149,7 +150,10 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
           if (index >= state.products.length) {
             return const Center(child: CircularProgressIndicator());
           }
-          return ProductCard(product: state.products[index]);
+          return ProductCard(
+            product: state.products[index],
+            onTap: () => context.push('/products/${state.products[index].id}'),
+          );
         },
       ),
     );

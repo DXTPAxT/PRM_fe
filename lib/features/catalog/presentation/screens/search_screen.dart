@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/common_widgets.dart';
@@ -142,7 +143,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         childAspectRatio: 0.62,
       ),
       itemCount: _results.length,
-      itemBuilder: (context, index) => ProductCard(product: _results[index]),
+      itemBuilder: (context, index) => ProductCard(
+        product: _results[index],
+        onTap: () => context.push('/products/${_results[index].id}'),
+      ),
     );
   }
 }

@@ -16,6 +16,7 @@ import '../../features/orders/presentation/screens/orders_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../../features/profile/presentation/screens/address_book_screen.dart';
 import '../../features/admin/presentation/screens/admin_screen.dart';
+import '../../features/catalog/presentation/screens/product_detail_screen.dart';
 
 import '../../features/auth/presentation/providers/auth_provider.dart';
 
@@ -96,6 +97,12 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/admin',
         builder: (context, state) => const AdminScreen(),
+      ),
+      GoRoute(
+        path: '/products/:id',
+        builder: (context, state) => ProductDetailScreen(
+          productId: state.pathParameters['id']!,
+        ),
       ),
       // Bottom Navigation shell route
       StatefulShellRoute.indexedStack(
