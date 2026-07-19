@@ -28,6 +28,17 @@ class AuthRemoteDataSource {
     );
   }
 
+  Future<ApiResponse<void>> logout(String refreshToken) async {
+    final response = await _dioClient.post(
+      '/auth/logout',
+      data: {'refreshToken': refreshToken},
+    );
+    return ApiResponse<void>.fromJson(
+      response.data as Map<String, dynamic>,
+      (_) {},
+    );
+  }
+
   Future<ApiResponse<RegisterChallenge>> register(
     RegisterRequest request,
   ) async {

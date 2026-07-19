@@ -7,6 +7,8 @@ abstract class AuthRepository {
 
   Future<AuthResponse> login({required String email, required String password});
 
+  Future<void> logout({required String refreshToken});
+
   Future<RegisterChallenge> register({
     required String fullName,
     required String email,

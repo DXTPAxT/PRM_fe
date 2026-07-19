@@ -219,6 +219,16 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> logout() async {
+    final refreshToken = await _secureStorage.getRefreshToken();
+    if (refreshToken != null && refreshToken.isNotEmpty) {
+      try {
+        await _ref
+            .read(authRepositoryProvider)
+            .logout(refreshToken: refreshToken);
+      } catch (_) {
+        // Always clear local credentials even if the server is unavailable.
+      }
+    }
     await _secureStorage.clearTokens();
     await HiveCache.clearAll();
     state = AuthState.unauthenticated();

@@ -24,10 +24,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   void _submit() {
     if (_formKey.currentState!.validate()) {
-      ref.read(authProvider.notifier).login(
-            _emailController.text.trim(),
-            _passwordController.text,
-          );
+      ref
+          .read(authProvider.notifier)
+          .login(_emailController.text.trim(), _passwordController.text);
     }
   }
 
@@ -89,8 +88,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     final isEmail = RegExp(
                       r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
                     ).hasMatch(identifier);
-                    final isPhone = RegExp(r'^0[35789][0-9]{8}$')
-                        .hasMatch(identifier);
+                    final isPhone = RegExp(
+                      r'^0[35789][0-9]{8}$',
+                    ).hasMatch(identifier);
                     if (!isEmail && !isPhone) {
                       return 'Email hoặc số điện thoại không hợp lệ';
                     }
@@ -110,8 +110,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     if (value == null || value.isEmpty) {
                       return 'Vui lòng nhập mật khẩu';
                     }
-                    if (value.length < 6) {
-                      return 'Mật khẩu phải từ 6 ký tự trở lên';
+                    if (value.length < 8) {
+                      return 'Mật khẩu phải có ít nhất 8 ký tự';
                     }
                     return null;
                   },

@@ -29,6 +29,14 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<void> logout({required String refreshToken}) async {
+    final response = await _remoteDataSource.logout(refreshToken);
+    if (!response.success) {
+      throw Exception(response.message ?? 'Đăng xuất thất bại.');
+    }
+  }
+
+  @override
   Future<RegisterChallenge> register({
     required String fullName,
     required String email,
