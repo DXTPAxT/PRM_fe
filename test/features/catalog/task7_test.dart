@@ -1,9 +1,7 @@
 import 'package:clothing_store_app/features/auth/presentation/providers/auth_provider.dart';
 import 'package:clothing_store_app/features/catalog/domain/repositories/catalog_repository.dart';
 import 'package:clothing_store_app/features/catalog/presentation/providers/catalog_provider.dart';
-import 'package:clothing_store_app/features/catalog/presentation/providers/review_provider.dart';
 import 'package:clothing_store_app/features/catalog/presentation/screens/product_detail_screen.dart';
-import 'package:clothing_store_app/features/catalog/presentation/widgets/review_form_sheet.dart';
 import 'package:clothing_store_app/features/catalog/presentation/widgets/review_list.dart';
 import 'package:clothing_store_app/shared/models/product.dart';
 import 'package:clothing_store_app/shared/models/review.dart';
@@ -154,7 +152,7 @@ void main() {
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
 
-      final fakeUser = const User(
+      const fakeUser = User(
         id: 'user-123',
         email: 'user@example.com',
         fullName: 'Nguyễn Văn A',
