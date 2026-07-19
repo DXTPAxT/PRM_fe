@@ -6,6 +6,9 @@ import '../../../../core/widgets/common_widgets.dart';
 import '../providers/catalog_provider.dart';
 import '../widgets/product_card.dart';
 
+import '../widgets/filter_bottom_sheet.dart';
+import 'search_screen.dart';
+
 class CatalogScreen extends ConsumerStatefulWidget {
   const CatalogScreen({super.key});
 
@@ -44,7 +47,34 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
     final notifier = ref.read(catalogProvider.notifier);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Danh mục sản phẩm')),
+      appBar: AppBar(
+        title: const Text('Danh mục sản phẩm'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            tooltip: 'Tìm kiếm',
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const SearchScreen()),
+            ),
+          ),
+          IconButton(
+            icon: Badge(
+              isLabelVisible: state.query.hasActiveFilter,
+              child: const Icon(Icons.filter_list),
+            ),
+            tooltip: 'Bộ lọc',
+            onPressed: () async {
+              final result = await showFilterBottomSheet(
+                context,
+                state.query,
+              );
+              if (result != null) {
+                await notifier.applyQuery(result);
+              }
+            },
+          ),
+        ],
+      ),
       body: Column(
         children: [
           if (state.categories.isNotEmpty)
