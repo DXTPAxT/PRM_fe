@@ -4,7 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../providers/product_detail_provider.dart';
+import '../providers/review_provider.dart';
 import '../widgets/product_card.dart' show formatVnd;
+import '../widgets/review_form_sheet.dart';
+import '../widgets/review_list.dart';
 import '../widgets/variant_selector.dart';
 
 class ProductDetailScreen extends ConsumerWidget {
@@ -19,7 +22,7 @@ class ProductDetailScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Chi tiết sản phẩm')),
-      body: _buildBody(context, state, notifier),
+      body: _buildBody(context, ref, state, notifier),
       bottomNavigationBar: state.product == null
           ? null
           : SafeArea(
@@ -43,6 +46,7 @@ class ProductDetailScreen extends ConsumerWidget {
 
   Widget _buildBody(
     BuildContext context,
+    WidgetRef ref,
     ProductDetailState state,
     ProductDetailNotifier notifier,
   ) {
@@ -139,9 +143,94 @@ class ProductDetailScreen extends ConsumerWidget {
                 const SizedBox(height: AppTheme.spaceS),
                 Text(product.description!),
               ],
+
+              const SizedBox(height: AppTheme.spaceL),
+              const Divider(),
+              const SizedBox(height: AppTheme.spaceM),
+              _buildReviewSection(context, ref),
             ],
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _buildReviewSection(BuildContext context, WidgetRef ref) {
+    final reviewState = ref.watch(reviewProvider(productId));
+    final reviewNotifier = ref.read(reviewProvider(productId).notifier);
+
+    Future<void> openForm() async {
+      final result = await showReviewFormSheet(
+        context,
+        existing: reviewState.myReview,
+      );
+      if (result == null) return;
+
+      try {
+        if (reviewState.myReview != null) {
+          await reviewNotifier.edit(
+            id: reviewState.myReview!.id,
+            rating: result.rating,
+            comment: result.comment,
+          );
+        } else {
+          await reviewNotifier.submit(
+            rating: result.rating,
+            comment: result.comment,
+          );
+        }
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Đã lưu đánh giá của bạn.')),
+        );
+      } catch (error) {
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              error.toString().replaceFirst('Exception: ', ''),
+            ),
+          ),
+        );
+      }
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Text(
+              'Đánh giá',
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+            ),
+            const Spacer(),
+            TextButton.icon(
+              onPressed: reviewState.isSubmitting ? null : openForm,
+              icon: Icon(
+                reviewState.myReview != null ? Icons.edit : Icons.rate_review,
+                size: 18,
+              ),
+              label: Text(
+                reviewState.myReview != null ? 'Sửa đánh giá' : 'Viết đánh giá',
+              ),
+            ),
+          ],
+        ),
+        if (reviewState.isLoading)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: AppTheme.spaceM),
+            child: Center(child: CircularProgressIndicator()),
+          )
+        else
+          ReviewList(reviews: reviewState.reviews),
+        if (reviewState.hasMore)
+          Center(
+            child: TextButton(
+              onPressed: reviewNotifier.loadMore,
+              child: const Text('Xem thêm đánh giá'),
+            ),
+          ),
       ],
     );
   }
