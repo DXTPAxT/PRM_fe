@@ -17,6 +17,42 @@ class AuthRemoteDataSource {
     );
   }
 
+  Future<ApiResponse<User>> updateProfile({
+    required String fullName,
+    String? email,
+    String? phone,
+  }) async {
+    final response = await _dioClient.patch(
+      '/users/me',
+      data: {
+        'fullName': fullName,
+        'email': email,
+        'phone': phone,
+      },
+    );
+    return ApiResponse<User>.fromJson(
+      response.data as Map<String, dynamic>,
+      (json) => User.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  Future<ApiResponse<void>> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    final response = await _dioClient.patch(
+      '/users/me/password',
+      data: {
+        'currentPassword': currentPassword,
+        'newPassword': newPassword,
+      },
+    );
+    return ApiResponse<void>.fromJson(
+      response.data as Map<String, dynamic>,
+      (_) {},
+    );
+  }
+
   Future<ApiResponse<AuthResponse>> login(LoginRequest request) async {
     final response = await _dioClient.post(
       '/auth/login',

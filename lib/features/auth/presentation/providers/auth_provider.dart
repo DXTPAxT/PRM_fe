@@ -86,6 +86,38 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  Future<User> refreshCurrentUser() async {
+    final user = await _ref.read(getCurrentUserUseCaseProvider).call();
+    state = AuthState.authenticated(user);
+    return user;
+  }
+
+  Future<User> updateProfile({
+    required String fullName,
+    String? email,
+    String? phone,
+  }) async {
+    final user = await _ref.read(authRepositoryProvider).updateProfile(
+      fullName: fullName,
+      email: email,
+      phone: phone,
+    );
+    state = AuthState.authenticated(user);
+    return user;
+  }
+
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    await _ref.read(authRepositoryProvider).changePassword(
+      currentPassword: currentPassword,
+      newPassword: newPassword,
+    );
+    // Backend revokes every refresh session after a password change.
+    await logout();
+  }
+
   Future<void> login(String email, String password) async {
     state = AuthState.loading();
     try {

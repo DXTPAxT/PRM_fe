@@ -17,6 +17,35 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<User> updateProfile({
+    required String fullName,
+    String? email,
+    String? phone,
+  }) async {
+    final response = await _remoteDataSource.updateProfile(
+      fullName: fullName,
+      email: email,
+      phone: phone,
+    );
+    if (response.success && response.data != null) return response.data!;
+    throw Exception(response.message ?? 'Cập nhật hồ sơ thất bại.');
+  }
+
+  @override
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    final response = await _remoteDataSource.changePassword(
+      currentPassword: currentPassword,
+      newPassword: newPassword,
+    );
+    if (!response.success) {
+      throw Exception(response.message ?? 'Đổi mật khẩu thất bại.');
+    }
+  }
+
+  @override
   Future<AuthResponse> login({
     required String email,
     required String password,

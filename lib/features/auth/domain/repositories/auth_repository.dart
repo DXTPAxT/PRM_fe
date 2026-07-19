@@ -5,6 +5,17 @@ import '../../data/models/otp_models.dart';
 abstract class AuthRepository {
   Future<User> getCurrentUser();
 
+  Future<User> updateProfile({
+    required String fullName,
+    String? email,
+    String? phone,
+  });
+
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  });
+
   Future<AuthResponse> login({required String email, required String password});
 
   Future<void> logout({required String refreshToken});
