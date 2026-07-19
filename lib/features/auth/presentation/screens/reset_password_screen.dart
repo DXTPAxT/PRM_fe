@@ -17,6 +17,12 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
   final _passwordController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    _emailController.text = ref.read(authProvider).pendingIdentifier ?? '';
+  }
+
+  @override
   void dispose() {
     _emailController.dispose();
     _otpController.dispose();
@@ -97,10 +103,9 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                   prefixIcon: Icon(Icons.pin_outlined),
                 ),
                 validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Vui lòng nhập mã OTP';
-                  }
-                  return null;
+                  return value != null && RegExp(r'^\d{6}$').hasMatch(value.trim())
+                      ? null
+                      : 'OTP phải gồm đúng 6 chữ số';
                 },
               ),
               const SizedBox(height: 16),
@@ -116,8 +121,8 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                   if (value == null || value.isEmpty) {
                     return 'Vui lòng nhập mật khẩu';
                   }
-                  if (value.length < 6) {
-                    return 'Mật khẩu phải từ 6 ký tự trở lên';
+                  if (value.length < 8) {
+                    return 'Mật khẩu phải từ 8 ký tự trở lên';
                   }
                   return null;
                 },

@@ -75,19 +75,6 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> verifyOtpForPassword({
-    required String email,
-    required String otp,
-  }) async {
-    final response = await _remoteDataSource.verifyForgotPasswordOtp(
-      VerifyOtpRequest(email: email, otp: otp),
-    );
-    if (!response.success) {
-      throw Exception(response.message ?? 'Xác thực OTP thất bại.');
-    }
-  }
-
-  @override
   Future<void> forgotPassword({required String email}) async {
     final response = await _remoteDataSource.forgotPassword(
       ForgotPasswordRequest(email: email),

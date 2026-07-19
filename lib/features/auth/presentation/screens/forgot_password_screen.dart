@@ -40,8 +40,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
           ),
         );
         if (isSuccess) {
-          // Navigate to verify OTP, passing email as routing parameter or query
-          context.push('/verify-otp');
+          // OTP reset is verified together with the new password.
+          context.push('/reset-password');
         }
       }
     });

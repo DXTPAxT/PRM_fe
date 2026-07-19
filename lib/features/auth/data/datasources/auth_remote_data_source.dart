@@ -74,25 +74,12 @@ class AuthRemoteDataSource {
     );
   }
 
-  Future<ApiResponse<void>> verifyForgotPasswordOtp(
-    VerifyOtpRequest request,
-  ) async {
-    final response = await _dioClient.post(
-      '/auth/otp/verify',
-      data: request.toJson(),
-    );
-    return ApiResponse<void>.fromJson(
-      response.data as Map<String, dynamic>,
-      (_) {},
-    );
-  }
-
   Future<ApiResponse<void>> forgotPassword(
     ForgotPasswordRequest request,
   ) async {
     final response = await _dioClient.post(
       '/auth/forgot-password',
-      data: request.toJson(),
+      data: {'identifier': request.email},
     );
     return ApiResponse<void>.fromJson(
       response.data as Map<String, dynamic>,
@@ -103,7 +90,11 @@ class AuthRemoteDataSource {
   Future<ApiResponse<void>> resetPassword(ResetPasswordRequest request) async {
     final response = await _dioClient.post(
       '/auth/reset-password',
-      data: request.toJson(),
+      data: {
+        'identifier': request.email,
+        'otp': request.otp,
+        'newPassword': request.newPassword,
+      },
     );
     return ApiResponse<void>.fromJson(
       response.data as Map<String, dynamic>,

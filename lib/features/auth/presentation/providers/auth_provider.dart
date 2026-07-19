@@ -175,13 +175,19 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> forgotPassword(String email) async {
-    state = AuthState.loading();
+    state = AuthState.loading(pendingIdentifier: email);
     try {
       final forgotPasswordUseCase = _ref.read(forgotPasswordUseCaseProvider);
       await forgotPasswordUseCase(email: email);
-      state = AuthState.unauthenticated(error: 'Mã OTP đã gửi về email.');
+      state = AuthState.unauthenticated(
+        error: 'OTP đã được gửi nếu thông tin tồn tại. Vui lòng kiểm tra email.',
+        pendingIdentifier: email,
+      );
     } catch (e) {
-      state = AuthState.unauthenticated(error: e.toString());
+      state = AuthState.unauthenticated(
+        error: e.toString(),
+        pendingIdentifier: email,
+      );
     }
   }
 
@@ -190,7 +196,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     String otp,
     String newPassword,
   ) async {
-    state = AuthState.loading();
+    state = AuthState.loading(pendingIdentifier: email);
     try {
       final resetPasswordUseCase = _ref.read(resetPasswordUseCaseProvider);
       await resetPasswordUseCase(
@@ -200,9 +206,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
       );
       state = AuthState.unauthenticated(
         error: 'Đổi mật khẩu thành công. Vui lòng đăng nhập.',
+        pendingIdentifier: email,
       );
     } catch (e) {
-      state = AuthState.unauthenticated(error: e.toString());
+      state = AuthState.unauthenticated(
+        error: e.toString(),
+        pendingIdentifier: email,
+      );
     }
   }
 

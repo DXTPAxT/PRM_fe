@@ -20,11 +20,6 @@ abstract class AuthRepository {
 
   Future<RegisterChallenge> resendOtp({required String identifier});
 
-  Future<void> verifyOtpForPassword({
-    required String email,
-    required String otp,
-  });
-
   Future<void> forgotPassword({required String email});
 
   Future<void> resetPassword({
