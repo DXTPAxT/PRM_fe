@@ -14,6 +14,7 @@ import '../../features/catalog/presentation/screens/catalog_screen.dart';
 import '../../features/cart/presentation/screens/cart_screen.dart';
 import '../../features/orders/presentation/screens/orders_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
+import '../../features/profile/presentation/screens/address_book_screen.dart';
 import '../../features/admin/presentation/screens/admin_screen.dart';
 
 import '../../features/auth/presentation/providers/auth_provider.dart';
@@ -27,7 +28,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) {
       final authState = ref.read(authProvider);
       final status = authState.status;
-      
+
       final isSplash = state.matchedLocation == '/splash';
       final isAuthRoute = state.matchedLocation == '/login' ||
           state.matchedLocation == '/register' ||
@@ -87,6 +88,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/reset-password',
         builder: (context, state) => const ResetPasswordScreen(),
+      ),
+      GoRoute(
+        path: '/addresses',
+        builder: (context, state) => const AddressBookScreen(),
       ),
       GoRoute(
         path: '/admin',

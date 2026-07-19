@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/auth_provider.dart';
-import '../../../../shared/models/user.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -25,39 +24,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   void _submit() {
     if (_formKey.currentState!.validate()) {
-      ref.read(authProvider.notifier).login(
-            _emailController.text.trim(),
-            _passwordController.text,
-          );
+      ref
+          .read(authProvider.notifier)
+          .login(_emailController.text.trim(), _passwordController.text);
     }
-  }
-
-  void _mockLoginCustomer() {
-    ref.read(authProvider.notifier).setAuthenticatedUser(
-          const User(
-            id: 'mock_cus_1',
-            fullName: 'Customer Test',
-            email: 'customer@test.com',
-            phone: '0112233445',
-            role: 'customer',
-          ),
-          'mock_access_token',
-          'mock_refresh_token',
-        );
-  }
-
-  void _mockLoginAdmin() {
-    ref.read(authProvider.notifier).setAuthenticatedUser(
-          const User(
-            id: 'mock_adm_1',
-            fullName: 'Admin Test',
-            email: 'admin@test.com',
-            phone: '0998877665',
-            role: 'admin',
-          ),
-          'mock_access_token',
-          'mock_refresh_token',
-        );
   }
 
   @override
@@ -106,16 +76,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(
-                    labelText: 'Email',
-                    hintText: 'Nhập email của bạn',
+                    labelText: 'Email hoặc số điện thoại',
+                    hintText: 'Nhập email hoặc số điện thoại',
                     prefixIcon: Icon(Icons.email_outlined),
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return 'Vui lòng nhập email';
                     }
-                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                      return 'Email không hợp lệ';
+                    final identifier = value.trim();
+                    final isEmail = RegExp(
+                      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                    ).hasMatch(identifier);
+                    final isPhone = RegExp(
+                      r'^0[35789][0-9]{8}$',
+                    ).hasMatch(identifier);
+                    if (!isEmail && !isPhone) {
+                      return 'Email hoặc số điện thoại không hợp lệ';
                     }
                     return null;
                   },
@@ -133,8 +110,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     if (value == null || value.isEmpty) {
                       return 'Vui lòng nhập mật khẩu';
                     }
-                    if (value.length < 6) {
-                      return 'Mật khẩu phải từ 6 ký tự trở lên';
+                    if (value.length < 8) {
+                      return 'Mật khẩu phải có ít nhất 8 ký tự';
                     }
                     return null;
                   },
@@ -167,38 +144,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         context.push('/register');
                       },
                       child: const Text('Đăng ký ngay'),
-                    ),
-                  ],
-                ),
-                const Divider(height: 32),
-                const Text(
-                  'Thử nghiệm nhanh (Bypass / Mock)',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: _mockLoginCustomer,
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          textStyle: const TextStyle(fontSize: 13),
-                        ),
-                        child: const Text('Mock Customer'),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: _mockLoginAdmin,
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          textStyle: const TextStyle(fontSize: 13),
-                        ),
-                        child: const Text('Mock Admin'),
-                      ),
                     ),
                   ],
                 ),

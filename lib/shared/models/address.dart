@@ -7,10 +7,14 @@ part 'address.g.dart';
 class Address with _$Address {
   const factory Address({
     required String id,
-    @JsonKey(name: 'user_id') required String userId,
-    required String detail,
+    required String userId,
+    required String fullName,
     required String phone,
+    required String detail,
+    required bool isDefault,
+    required DateTime createdAt,
   }) = _Address;
 
-  factory Address.fromJson(Map<String, dynamic> json) => _$AddressFromJson(json);
+  factory Address.fromJson(Map<String, dynamic> json) =>
+      _$AddressFromJson(json);
 }

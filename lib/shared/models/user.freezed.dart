@@ -24,8 +24,8 @@ mixin _$User {
   String get id => throw _privateConstructorUsedError;
   @JsonKey(name: 'full_name')
   String get fullName => throw _privateConstructorUsedError;
-  String get email => throw _privateConstructorUsedError;
-  String get phone => throw _privateConstructorUsedError;
+  String? get email => throw _privateConstructorUsedError;
+  String? get phone => throw _privateConstructorUsedError;
   String get role => throw _privateConstructorUsedError;
 
   /// Serializes this User to a JSON map.
@@ -45,8 +45,8 @@ abstract class $UserCopyWith<$Res> {
   $Res call({
     String id,
     @JsonKey(name: 'full_name') String fullName,
-    String email,
-    String phone,
+    String? email,
+    String? phone,
     String role,
   });
 }
@@ -85,11 +85,11 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
             email: null == email
                 ? _value.email
                 : email // ignore: cast_nullable_to_non_nullable
-                      as String,
+                      as String?,
             phone: null == phone
                 ? _value.phone
                 : phone // ignore: cast_nullable_to_non_nullable
-                      as String,
+                      as String?,
             role: null == role
                 ? _value.role
                 : role // ignore: cast_nullable_to_non_nullable
@@ -111,8 +111,8 @@ abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
   $Res call({
     String id,
     @JsonKey(name: 'full_name') String fullName,
-    String email,
-    String phone,
+    String? email,
+    String? phone,
     String role,
   });
 }
@@ -148,11 +148,11 @@ class __$$UserImplCopyWithImpl<$Res>
         email: null == email
             ? _value.email
             : email // ignore: cast_nullable_to_non_nullable
-                  as String,
+                  as String?,
         phone: null == phone
             ? _value.phone
             : phone // ignore: cast_nullable_to_non_nullable
-                  as String,
+                  as String?,
         role: null == role
             ? _value.role
             : role // ignore: cast_nullable_to_non_nullable
@@ -168,8 +168,8 @@ class _$UserImpl implements _User {
   const _$UserImpl({
     required this.id,
     @JsonKey(name: 'full_name') required this.fullName,
-    required this.email,
-    required this.phone,
+    this.email,
+    this.phone,
     required this.role,
   });
 
@@ -182,9 +182,9 @@ class _$UserImpl implements _User {
   @JsonKey(name: 'full_name')
   final String fullName;
   @override
-  final String email;
+  final String? email;
   @override
-  final String phone;
+  final String? phone;
   @override
   final String role;
 
@@ -229,8 +229,8 @@ abstract class _User implements User {
   const factory _User({
     required final String id,
     @JsonKey(name: 'full_name') required final String fullName,
-    required final String email,
-    required final String phone,
+    final String? email,
+    final String? phone,
     required final String role,
   }) = _$UserImpl;
 
@@ -242,9 +242,9 @@ abstract class _User implements User {
   @JsonKey(name: 'full_name')
   String get fullName;
   @override
-  String get email;
+  String? get email;
   @override
-  String get phone;
+  String? get phone;
   @override
   String get role;
 

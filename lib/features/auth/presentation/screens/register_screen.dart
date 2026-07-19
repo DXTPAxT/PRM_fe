@@ -27,38 +27,47 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   }
 
   void _submit() {
-    if (_formKey.currentState!.validate()) {
-      ref.read(authProvider.notifier).register(
-            fullName: _nameController.text.trim(),
-            email: _emailController.text.trim(),
-            phone: _phoneController.text.trim(),
-            password: _passwordController.text,
-          );
-    }
+    if (!_formKey.currentState!.validate()) return;
+    ref
+        .read(authProvider.notifier)
+        .register(
+          fullName: _nameController.text.trim(),
+          email: _emailController.text.trim().toLowerCase(),
+          phone: _phoneController.text.trim(),
+          password: _passwordController.text,
+        );
   }
 
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
 
-    // Listening for validation / success state messages
     ref.listen<AuthState>(authProvider, (previous, next) {
-      if (next.errorMessage != null && next.errorMessage!.isNotEmpty) {
+      if (!mounted) return;
+      if (next.otpChallenge != null && previous?.otpChallenge == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('OTP đã được gửi. Vui lòng kiểm tra email.'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        context.go('/verify-otp');
+      } else if (next.errorMessage != null &&
+          next.errorMessage!.isNotEmpty &&
+          !next.isLoading &&
+          next.otpChallenge == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(next.errorMessage!),
-            backgroundColor: next.errorMessage!.contains('thành công') ? Colors.green : Colors.red,
+            backgroundColor: Colors.red,
           ),
         );
-        if (next.errorMessage!.contains('thành công')) {
-          context.go('/login');
-        }
       }
     });
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Đăng Ký Tài Khoản'),
+        title: const Text('Đăng ký tài khoản'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
@@ -66,38 +75,28 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       ),
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(24),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const Text(
-                  'Tạo Tài Khoản Mới',
+                  'Tạo tài khoản mới',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.indigo,
-                  ),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Đăng ký để bắt đầu trải nghiệm mua sắm quần áo thời trang tuyệt vời.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.grey, fontSize: 13),
-                ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 28),
                 TextFormField(
                   controller: _nameController,
+                  textCapitalization: TextCapitalization.words,
                   decoration: const InputDecoration(
                     labelText: 'Họ và tên',
-                    hintText: 'Nhập họ tên đầy đủ',
                     prefixIcon: Icon(Icons.person_outline),
                   ),
                   validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Vui lòng nhập họ và tên';
+                    if (value == null || value.trim().length < 2) {
+                      return 'Họ tên phải có ít nhất 2 ký tự';
                     }
                     return null;
                   },
@@ -108,14 +107,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(
                     labelText: 'Email',
-                    hintText: 'Nhập email của bạn',
                     prefixIcon: Icon(Icons.email_outlined),
                   ),
                   validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Vui lòng nhập email';
-                    }
-                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                    final email = value?.trim() ?? '';
+                    if (email.isEmpty ||
+                        !RegExp(
+                          r'^[^\s@]+@[^\s@]+\.[^\s@]+$',
+                        ).hasMatch(email)) {
                       return 'Email không hợp lệ';
                     }
                     return null;
@@ -127,15 +126,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   keyboardType: TextInputType.phone,
                   decoration: const InputDecoration(
                     labelText: 'Số điện thoại',
-                    hintText: 'Nhập số điện thoại',
                     prefixIcon: Icon(Icons.phone_outlined),
                   ),
                   validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Vui lòng nhập số điện thoại';
-                    }
-                    if (value.trim().length < 9) {
-                      return 'Số điện thoại không hợp lệ';
+                    final phone = value?.trim() ?? '';
+                    if (!RegExp(r'^0[35789][0-9]{8}$').hasMatch(phone)) {
+                      return 'Số điện thoại phải gồm 10 số hợp lệ';
                     }
                     return null;
                   },
@@ -146,39 +142,27 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   obscureText: true,
                   decoration: const InputDecoration(
                     labelText: 'Mật khẩu',
-                    hintText: 'Tạo mật khẩu đăng nhập',
                     prefixIcon: Icon(Icons.lock_outline),
                   ),
                   validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Vui lòng nhập mật khẩu';
-                    }
-                    if (value.length < 6) {
-                      return 'Mật khẩu phải từ 6 ký tự trở lên';
+                    if (value == null || value.length < 8) {
+                      return 'Mật khẩu phải có ít nhất 8 ký tự';
                     }
                     return null;
                   },
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 28),
                 if (authState.isLoading)
                   const Center(child: CircularProgressIndicator())
                 else
                   ElevatedButton(
                     onPressed: _submit,
-                    child: const Text('Đăng ký'),
+                    child: const Text('Đăng ký và nhận OTP'),
                   ),
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text('Đã có tài khoản?'),
-                    TextButton(
-                      onPressed: () {
-                        context.pop();
-                      },
-                      child: const Text('Đăng nhập'),
-                    ),
-                  ],
+                const SizedBox(height: 16),
+                TextButton(
+                  onPressed: () => context.pop(),
+                  child: const Text('Đã có tài khoản? Đăng nhập'),
                 ),
               ],
             ),
