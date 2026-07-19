@@ -7,10 +7,12 @@ part 'review.g.dart';
 class Review with _$Review {
   const factory Review({
     required String id,
-    @JsonKey(name: 'user_id') required String userId,
-    @JsonKey(name: 'product_id') required String productId,
-    required double rating,
-    required String comment,
+    required String userId,
+    @Default('Người dùng') String userFullName,
+    required String productId,
+    required int rating,
+    String? comment,
+    DateTime? createdAt,
   }) = _Review;
 
   factory Review.fromJson(Map<String, dynamic> json) => _$ReviewFromJson(json);
