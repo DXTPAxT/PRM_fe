@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/common_widgets.dart';
+import '../../../../shared/models/product_variant.dart';
+import '../../../cart/presentation/providers/cart_provider.dart';
 import '../providers/product_detail_provider.dart';
 import '../providers/review_provider.dart';
 import '../widgets/product_card.dart' show formatVnd;
@@ -25,22 +28,7 @@ class ProductDetailScreen extends ConsumerWidget {
       body: _buildBody(context, ref, state, notifier),
       bottomNavigationBar: state.product == null
           ? null
-          : SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(AppTheme.spaceM),
-                child: Tooltip(
-                  message: 'Chức năng giỏ hàng do Member 3 phát triển',
-                  child: ElevatedButton.icon(
-                    onPressed: null, // Cố ý disabled — không thuộc phần M2
-                    icon: const Icon(Icons.shopping_cart_outlined),
-                    label: const Text('Thêm vào giỏ'),
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(48),
-                    ),
-                  ),
-                ),
-              ),
-            ),
+          : _AddToCartBar(variant: state.selectedVariant),
     );
   }
 
@@ -232,6 +220,94 @@ class ProductDetailScreen extends ConsumerWidget {
             ),
           ),
       ],
+    );
+  }
+}
+
+/// Nút thêm vào giỏ (Member 3). Chỉ bật khi đã chọn đủ biến thể và còn hàng.
+class _AddToCartBar extends ConsumerStatefulWidget {
+  final ProductVariant? variant;
+
+  const _AddToCartBar({required this.variant});
+
+  @override
+  ConsumerState<_AddToCartBar> createState() => _AddToCartBarState();
+}
+
+class _AddToCartBarState extends ConsumerState<_AddToCartBar> {
+  bool _isAdding = false;
+
+  Future<void> _addToCart() async {
+    final variant = widget.variant;
+    if (variant == null) return;
+
+    setState(() => _isAdding = true);
+    final ok = await ref
+        .read(cartProvider.notifier)
+        .addItem(variantId: variant.id, quantity: 1);
+    if (!mounted) return;
+    setState(() => _isAdding = false);
+
+    if (ok) {
+      final messenger = ScaffoldMessenger.of(context);
+      messenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: const Text('Đã thêm vào giỏ hàng'),
+            duration: const Duration(seconds: 3),
+            action: SnackBarAction(
+              label: 'Xem giỏ',
+              onPressed: () {
+                messenger.hideCurrentSnackBar();
+                context.go('/cart');
+              },
+            ),
+          ),
+        );
+    }
+    // Lỗi đã được cartProvider set vào state; hiện luôn ở đây cho tiện.
+    final error = ref.read(cartProvider).errorMessage;
+    if (!ok && error != null) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(error)));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final variant = widget.variant;
+    final outOfStock = variant != null && variant.stockQty <= 0;
+    final enabled = variant != null && !outOfStock && !_isAdding;
+
+    final label = variant == null
+        ? 'Chọn size và màu'
+        : outOfStock
+            ? 'Hết hàng'
+            : 'Thêm vào giỏ';
+
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(AppTheme.spaceM),
+        child: ElevatedButton.icon(
+          onPressed: enabled ? _addToCart : null,
+          icon: _isAdding
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              : const Icon(Icons.shopping_cart_outlined),
+          label: Text(label),
+          style: ElevatedButton.styleFrom(
+            minimumSize: const Size.fromHeight(48),
+          ),
+        ),
+      ),
     );
   }
 }

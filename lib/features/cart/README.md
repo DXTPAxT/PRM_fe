@@ -32,7 +32,19 @@
 - `CartRepository`
 
 ## Pending Tasks
-- [ ] Create `CartItem` freezed model mapping the cart response.
-- [ ] Implement data layer `CartRemoteDataSource` and `CartRepositoryImpl`.
-- [ ] Implement usecases and state notifiers (`cartProvider`).
-- [ ] Build Cart layout showing item details, totals, and quantity controls.
+- [x] Create `CartItem` freezed model mapping the cart response.
+- [x] Implement data layer `CartRemoteDataSource` and `CartRepositoryImpl`.
+- [x] Implement usecases and state notifiers (`cartProvider`).
+- [x] Build Cart layout showing item details, totals, and quantity controls.
+
+## Ghi chú triển khai
+
+- Endpoint thực tế của BE khác README gốc: thêm/sửa/xóa item dùng
+  `POST /cart/items`, `PATCH /cart/items/:itemId`, `DELETE /cart/items/:itemId`,
+  ngoài ra có `DELETE /cart` để xóa sạch giỏ.
+- Model đặt trong `data/models/cart_response.dart` (`CartResponse`,
+  `CartLineItem`, `CartVariant`, `CartProduct`) — mirror đúng
+  `CartService.toResponse()` của BE, gồm cả `lineTotal` và `subtotal` tính sẵn.
+- `cartItemCountProvider` cấp số lượng cho badge trên bottom navigation.
+- Nút "Thêm vào giỏ" ở `catalog/product_detail_screen.dart` đã được nối vào
+  `cartProvider.addItem()` (trước đó Member 2 để disabled).
