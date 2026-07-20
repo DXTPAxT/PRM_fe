@@ -97,7 +97,7 @@ void main() {
       expect(state.availableColors, containsAll(['Đen']));
     });
 
-    testWidgets('ProductDetailScreen displays detail and handles variant interaction & cart disabled', (tester) async {
+    testWidgets('ProductDetailScreen displays detail and handles variant interaction & cart button states', (tester) async {
       final mockRepo = MockCatalogRepository();
 
       // Set screen height larger to accommodate full detail screen
@@ -150,16 +150,27 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('SKU: AT-M-DEN'), findsNothing);
 
-      // Scenario 5: Check disabled Add to Cart button with Tooltip
-      final cartBtnFinder = find.widgetWithText(ElevatedButton, 'Thêm vào giỏ');
-      expect(cartBtnFinder, findsOneWidget);
-      final ElevatedButton cartBtn = tester.widget(cartBtnFinder);
-      expect(cartBtn.onPressed, isNull); // disabled
+      // Scenario 5: Chưa chọn đủ biến thể (vừa đổi size L nên color bị xóa)
+      // -> nút giỏ hàng disabled và nhắc chọn size/màu.
+      // (Member 3 đã nối chức năng giỏ hàng; trước đây nút luôn disabled.)
+      final promptBtnFinder =
+          find.widgetWithText(ElevatedButton, 'Chọn size và màu');
+      expect(promptBtnFinder, findsOneWidget);
+      final ElevatedButton promptBtn = tester.widget(promptBtnFinder);
+      expect(promptBtn.onPressed, isNull); // disabled khi chưa đủ biến thể
 
-      final tooltipFinder = find.byType(Tooltip);
-      expect(tooltipFinder, findsOneWidget);
-      final Tooltip tooltip = tester.widget(tooltipFinder);
-      expect(tooltip.message, equals('Chức năng giỏ hàng do Member 3 phát triển'));
+      // Chọn màu 'Đen' cho size L — biến thể này stockQty = 0
+      // -> nút hiển thị "Hết hàng" và vẫn disabled.
+      final chipDenL = find.widgetWithText(ChoiceChip, 'Đen');
+      await tester.ensureVisible(chipDenL);
+      await tester.tap(chipDenL);
+      await tester.pumpAndSettle();
+
+      final outOfStockFinder =
+          find.widgetWithText(ElevatedButton, 'Hết hàng');
+      expect(outOfStockFinder, findsOneWidget);
+      final ElevatedButton outOfStockBtn = tester.widget(outOfStockFinder);
+      expect(outOfStockBtn.onPressed, isNull); // hết hàng -> không cho thêm
     });
   });
 }

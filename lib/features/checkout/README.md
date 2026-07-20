@@ -17,7 +17,6 @@
 - `core/network`
 - `features/orders`
 - `shared/models/` (`Payment`, `Voucher`, `Address`)
-- WebView package (e.g., `webview_flutter` if doing online redirects)
 
 ## Recommended Core Entities & Models
 - `Voucher`
@@ -31,7 +30,32 @@
 - `CheckoutRepository`
 
 ## Pending Tasks
-- [ ] Implement data layer `CheckoutRemoteDataSource` and `CheckoutRepositoryImpl`.
-- [ ] Integrate usecases and state management (`checkoutProvider`).
-- [ ] Build Checkout details selection form (delivery address, shipment method, voucher input).
-- [ ] Integrate payment web view for redirection to VNPAY/Momo/etc.
+- [x] Implement data layer `CheckoutRemoteDataSource` (tạo đơn tái dùng `OrdersRepository`).
+- [x] Integrate usecases and state management (`checkoutProvider`).
+- [x] Build Checkout details selection form (delivery address, payment method).
+- [x] Handle online payment result via simulate-callback dialog.
+
+## Ghi chú triển khai
+
+- Endpoint thanh toán thực tế của BE: `POST /payments/orders/:orderId/simulate-callback`
+  — dùng cho MỌI phương thức online (VNPay/MoMo/ZaloPay), không chỉ MoMo/ZaloPay
+  như dự kiến ban đầu.
+- Luồng: `POST /orders` tạo đơn trước → sau đó mới xử lý thanh toán theo
+  `paymentMethod`. COD thì vào thẳng chi tiết đơn.
+- **VNPay webview thật đã bị bỏ** (từng dùng `webview_flutter` + endpoint
+  `POST /payments/orders/:orderId/vnpay-url`). Lý do: VNPay sandbox gọi IPN/
+  Return URL server-to-server, nên backend cần địa chỉ truy cập được từ
+  internet — không khả thi khi chạy backend local (`localhost`), kể cả qua
+  ngrok free (ngrok chèn trang cảnh báo interstitial trước khi tới backend,
+  cả VNPay lẫn webview trong app đều không vượt qua được). Toàn bộ thanh
+  toán online giờ dùng `simulate-callback` để demo — xem dialog "Giả lập
+  thanh toán" ở `checkout_screen.dart` và `order_detail_screen.dart`.
+- Địa chỉ giao hàng tái dùng `addressProvider` của `features/profile`
+  (Member 1 sở hữu; M3 chỉ đọc).
+
+## Ngoài phạm vi bản này
+
+- **Voucher**: BE chưa có API list/verify voucher (chỉ có `/vouchers/ping`),
+  nên form checkout chưa có ô nhập voucher. Thêm lại khi Member 4 xong.
+- **Phí ship GHN**: chưa gửi `toDistrictId`/`toWardCode` vì cần UI dropdown
+  tỉnh/quận/phường của GHN. BE fallback `shippingFee = 0` khi thiếu.

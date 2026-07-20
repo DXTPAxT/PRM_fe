@@ -36,8 +36,22 @@
 - `OrderRepository`
 
 ## Pending Tasks
-- [ ] Implement data layer `OrderRemoteDataSource` and `OrderRepositoryImpl`.
-- [ ] Implement usecases and state management (`ordersProvider`, `orderDetailProvider`).
-- [ ] Build Order History tabs UI (Pending, Delivering, Completed, Cancelled).
-- [ ] Build Order detail timeline tracking view.
-- [ ] Build Review form dialog (stars input, comments input).
+- [x] Implement data layer `OrderRemoteDataSource` and `OrderRepositoryImpl`.
+- [x] Implement usecases and state management (`ordersProvider`, `orderDetailProvider`).
+- [x] Build Order History tabs UI (Pending, Delivering, Completed, Cancelled).
+- [x] Build Order detail timeline tracking view.
+- [x] Build Review form dialog (stars input, comments input).
+
+## Ghi chú triển khai
+
+- Endpoint hủy đơn thực tế là `PATCH /orders/:id/cancel` (không phải
+  `PATCH /orders/{id}/cancel` như README gốc ghi — đã khớp với BE).
+- Model đặt trong `data/models/order_detail.dart`, mirror `ORDER_DETAIL_SELECT`
+  của BE (có `subtotal`, `discount`, `shippingFee`, `shippingCode`, `address`,
+  `payment`). KHÔNG dùng `shared/models/order.dart` vì model đó thiếu field.
+- `domain/order_status_info.dart` giữ nhãn/màu/icon cho từng trạng thái và
+  `isOrderCancellable()` khớp `isCancellable` của BE (pending_payment, confirmed).
+- Timeline theo state machine BE: pending_payment → confirmed → packed →
+  shipping → delivered → completed; `cancelled` hiển thị banner riêng.
+- Review viết riêng trong feature này (không phụ thuộc `catalog`), gọi
+  `POST /reviews`. Nút đánh giá chỉ hiện khi đơn ở trạng thái `completed`.
