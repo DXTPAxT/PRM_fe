@@ -1,43 +1,53 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../widgets/admin_dashboard_tab.dart';
+import '../widgets/admin_orders_tab.dart';
+import '../widgets/admin_vouchers_tab.dart';
 
-class AdminScreen extends StatelessWidget {
+class AdminScreen extends ConsumerStatefulWidget {
   const AdminScreen({super.key});
+
+  @override
+  ConsumerState<AdminScreen> createState() => _AdminScreenState();
+}
+
+class _AdminScreenState extends ConsumerState<AdminScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Admin Panel')),
-      body: Center(
-        child: Card(
-          margin: const EdgeInsets.all(16),
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.admin_panel_settings_outlined, size: 64, color: Colors.purple),
-                const SizedBox(height: 16),
-                const Text(
-                  'Coming Soon',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Bảng điều khiển quản trị đang được phát triển bởi Member 4',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.grey),
-                ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('Quay lại App chính'),
-                ),
-              ],
-            ),
-          ),
+      appBar: AppBar(
+        title: const Text('Quản trị hệ thống'),
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(icon: Icon(Icons.dashboard_outlined), text: 'Tổng quan'),
+            Tab(icon: Icon(Icons.shopping_cart_outlined), text: 'Đơn hàng'),
+            Tab(icon: Icon(Icons.local_offer_outlined), text: 'Voucher'),
+          ],
         ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: const [
+          AdminDashboardTab(),
+          AdminOrdersTab(),
+          AdminVouchersTab(),
+        ],
       ),
     );
   }

@@ -16,8 +16,14 @@ import '../../features/orders/presentation/screens/orders_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../../features/profile/presentation/screens/address_book_screen.dart';
 import '../../features/admin/presentation/screens/admin_screen.dart';
+import '../../features/catalog/presentation/screens/product_detail_screen.dart';
+import '../../features/checkout/presentation/screens/checkout_screen.dart';
+import '../../features/orders/presentation/screens/order_detail_screen.dart';
+import '../../features/wishlist/presentation/screens/wishlist_screen.dart';
+import '../../features/notifications/presentation/screens/notifications_screen.dart';
 
 import '../../features/auth/presentation/providers/auth_provider.dart';
+import '../../features/cart/presentation/providers/cart_provider.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final routerNotifier = RouterNotifier(ref);
@@ -50,6 +56,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       // Authenticated state redirection
       if (status == AuthStatus.authenticated) {
         if (isSplash || isAuthRoute) {
+          if (authState.user?.role == 'admin') {
+            return '/admin';
+          }
           return '/';
         }
 
@@ -96,6 +105,30 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/admin',
         builder: (context, state) => const AdminScreen(),
+      ),
+      GoRoute(
+        path: '/products/:id',
+        builder: (context, state) => ProductDetailScreen(
+          productId: state.pathParameters['id']!,
+        ),
+      ),
+      GoRoute(
+        path: '/checkout',
+        builder: (context, state) => const CheckoutScreen(),
+      ),
+      GoRoute(
+        path: '/orders/:id',
+        builder: (context, state) => OrderDetailScreen(
+          orderId: state.pathParameters['id']!,
+        ),
+      ),
+      GoRoute(
+        path: '/wishlist',
+        builder: (context, state) => const WishlistScreen(),
+      ),
+      GoRoute(
+        path: '/notifications',
+        builder: (context, state) => const NotificationsScreen(),
       ),
       // Bottom Navigation shell route
       StatefulShellRoute.indexedStack(
@@ -162,13 +195,14 @@ class RouterNotifier extends ChangeNotifier {
   }
 }
 
-class MainShellScreen extends StatelessWidget {
+class MainShellScreen extends ConsumerWidget {
   final StatefulNavigationShell navigationShell;
 
   const MainShellScreen({super.key, required this.navigationShell});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final cartCount = ref.watch(cartItemCountProvider);
     return Scaffold(
       body: navigationShell,
       bottomNavigationBar: NavigationBar(
@@ -179,28 +213,36 @@ class MainShellScreen extends StatelessWidget {
             initialLocation: index == navigationShell.currentIndex,
           );
         },
-        destinations: const [
-          NavigationDestination(
+        destinations: [
+          const NavigationDestination(
             icon: Icon(Icons.home_outlined),
             selectedIcon: Icon(Icons.home),
             label: 'Trang chủ',
           ),
-          NavigationDestination(
+          const NavigationDestination(
             icon: Icon(Icons.category_outlined),
             selectedIcon: Icon(Icons.category),
             label: 'Danh mục',
           ),
           NavigationDestination(
-            icon: Icon(Icons.shopping_cart_outlined),
-            selectedIcon: Icon(Icons.shopping_cart),
+            icon: Badge(
+              isLabelVisible: cartCount > 0,
+              label: Text('$cartCount'),
+              child: const Icon(Icons.shopping_cart_outlined),
+            ),
+            selectedIcon: Badge(
+              isLabelVisible: cartCount > 0,
+              label: Text('$cartCount'),
+              child: const Icon(Icons.shopping_cart),
+            ),
             label: 'Giỏ hàng',
           ),
-          NavigationDestination(
+          const NavigationDestination(
             icon: Icon(Icons.receipt_long_outlined),
             selectedIcon: Icon(Icons.receipt_long),
             label: 'Đơn hàng',
           ),
-          NavigationDestination(
+          const NavigationDestination(
             icon: Icon(Icons.person_outline),
             selectedIcon: Icon(Icons.person),
             label: 'Tài khoản',

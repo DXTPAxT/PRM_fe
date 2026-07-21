@@ -7,13 +7,14 @@ part 'product_variant.g.dart';
 class ProductVariant with _$ProductVariant {
   const factory ProductVariant({
     required String id,
-    @JsonKey(name: 'product_id') required String productId,
+    required String productId,
     required String size,
     required String color,
     required double price,
-    @JsonKey(name: 'stock_qty') required int stockQty,
+    required int stockQty,
     required String sku,
   }) = _ProductVariant;
 
-  factory ProductVariant.fromJson(Map<String, dynamic> json) => _$ProductVariantFromJson(json);
+  factory ProductVariant.fromJson(Map<String, dynamic> json) =>
+      _$ProductVariantFromJson(json);
 }

@@ -1,17 +1,44 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
+class Voucher {
+  final String id;
+  final String code;
+  final double discount;
+  final double minOrder;
+  final String? expiresAt;
+  final bool isActive;
 
-part 'voucher.freezed.dart';
-part 'voucher.g.dart';
+  const Voucher({
+    required this.id,
+    required this.code,
+    required this.discount,
+    required this.minOrder,
+    this.expiresAt,
+    this.isActive = true,
+  });
 
-@freezed
-class Voucher with _$Voucher {
-  const factory Voucher({
-    required String id,
-    required String code,
-    required double discount,
-    @JsonKey(name: 'min_order') required double minOrder,
-    @JsonKey(name: 'expires_at') required String expiresAt,
-  }) = _Voucher;
+  factory Voucher.fromJson(Map<String, dynamic> json) {
+    double parseDouble(dynamic val) {
+      if (val == null) return 0.0;
+      if (val is num) return val.toDouble();
+      if (val is String) return double.tryParse(val) ?? 0.0;
+      return 0.0;
+    }
 
-  factory Voucher.fromJson(Map<String, dynamic> json) => _$VoucherFromJson(json);
+    return Voucher(
+      id: json['id'] as String? ?? '',
+      code: json['code'] as String? ?? '',
+      discount: parseDouble(json['discount']),
+      minOrder: parseDouble(json['minOrder'] ?? json['min_order']),
+      expiresAt: json['expiresAt'] as String? ?? json['expires_at'] as String?,
+      isActive: json['isActive'] as bool? ?? json['is_active'] as bool? ?? true,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'code': code,
+        'discount': discount,
+        'minOrder': minOrder,
+        'expiresAt': expiresAt,
+        'isActive': isActive,
+      };
 }

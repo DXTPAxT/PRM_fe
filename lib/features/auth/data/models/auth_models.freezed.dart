@@ -21,6 +21,7 @@ LoginRequest _$LoginRequestFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$LoginRequest {
+  @JsonKey(name: 'identifier')
   String get email => throw _privateConstructorUsedError;
   String get password => throw _privateConstructorUsedError;
 
@@ -41,7 +42,7 @@ abstract class $LoginRequestCopyWith<$Res> {
     $Res Function(LoginRequest) then,
   ) = _$LoginRequestCopyWithImpl<$Res, LoginRequest>;
   @useResult
-  $Res call({String email, String password});
+  $Res call({@JsonKey(name: 'identifier') String email, String password});
 }
 
 /// @nodoc
@@ -84,7 +85,7 @@ abstract class _$$LoginRequestImplCopyWith<$Res>
   ) = __$$LoginRequestImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String email, String password});
+  $Res call({@JsonKey(name: 'identifier') String email, String password});
 }
 
 /// @nodoc
@@ -119,12 +120,16 @@ class __$$LoginRequestImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$LoginRequestImpl implements _LoginRequest {
-  const _$LoginRequestImpl({required this.email, required this.password});
+  const _$LoginRequestImpl({
+    @JsonKey(name: 'identifier') required this.email,
+    required this.password,
+  });
 
   factory _$LoginRequestImpl.fromJson(Map<String, dynamic> json) =>
       _$$LoginRequestImplFromJson(json);
 
   @override
+  @JsonKey(name: 'identifier')
   final String email;
   @override
   final String password;
@@ -164,7 +169,7 @@ class _$LoginRequestImpl implements _LoginRequest {
 
 abstract class _LoginRequest implements LoginRequest {
   const factory _LoginRequest({
-    required final String email,
+    @JsonKey(name: 'identifier') required final String email,
     required final String password,
   }) = _$LoginRequestImpl;
 
@@ -172,6 +177,7 @@ abstract class _LoginRequest implements LoginRequest {
       _$LoginRequestImpl.fromJson;
 
   @override
+  @JsonKey(name: 'identifier')
   String get email;
   @override
   String get password;
@@ -190,7 +196,6 @@ RegisterRequest _$RegisterRequestFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$RegisterRequest {
-  @JsonKey(name: 'full_name')
   String get fullName => throw _privateConstructorUsedError;
   String get email => throw _privateConstructorUsedError;
   String get phone => throw _privateConstructorUsedError;
@@ -213,12 +218,7 @@ abstract class $RegisterRequestCopyWith<$Res> {
     $Res Function(RegisterRequest) then,
   ) = _$RegisterRequestCopyWithImpl<$Res, RegisterRequest>;
   @useResult
-  $Res call({
-    @JsonKey(name: 'full_name') String fullName,
-    String email,
-    String phone,
-    String password,
-  });
+  $Res call({String fullName, String email, String phone, String password});
 }
 
 /// @nodoc
@@ -274,12 +274,7 @@ abstract class _$$RegisterRequestImplCopyWith<$Res>
   ) = __$$RegisterRequestImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    @JsonKey(name: 'full_name') String fullName,
-    String email,
-    String phone,
-    String password,
-  });
+  $Res call({String fullName, String email, String phone, String password});
 }
 
 /// @nodoc
@@ -328,7 +323,7 @@ class __$$RegisterRequestImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$RegisterRequestImpl implements _RegisterRequest {
   const _$RegisterRequestImpl({
-    @JsonKey(name: 'full_name') required this.fullName,
+    required this.fullName,
     required this.email,
     required this.phone,
     required this.password,
@@ -338,7 +333,6 @@ class _$RegisterRequestImpl implements _RegisterRequest {
       _$$RegisterRequestImplFromJson(json);
 
   @override
-  @JsonKey(name: 'full_name')
   final String fullName;
   @override
   final String email;
@@ -389,7 +383,7 @@ class _$RegisterRequestImpl implements _RegisterRequest {
 
 abstract class _RegisterRequest implements RegisterRequest {
   const factory _RegisterRequest({
-    @JsonKey(name: 'full_name') required final String fullName,
+    required final String fullName,
     required final String email,
     required final String phone,
     required final String password,
@@ -399,7 +393,6 @@ abstract class _RegisterRequest implements RegisterRequest {
       _$RegisterRequestImpl.fromJson;
 
   @override
-  @JsonKey(name: 'full_name')
   String get fullName;
   @override
   String get email;
@@ -422,6 +415,7 @@ VerifyOtpRequest _$VerifyOtpRequestFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$VerifyOtpRequest {
+  @JsonKey(name: 'identifier')
   String get email => throw _privateConstructorUsedError;
   String get otp => throw _privateConstructorUsedError;
 
@@ -442,7 +436,7 @@ abstract class $VerifyOtpRequestCopyWith<$Res> {
     $Res Function(VerifyOtpRequest) then,
   ) = _$VerifyOtpRequestCopyWithImpl<$Res, VerifyOtpRequest>;
   @useResult
-  $Res call({String email, String otp});
+  $Res call({@JsonKey(name: 'identifier') String email, String otp});
 }
 
 /// @nodoc
@@ -485,7 +479,7 @@ abstract class _$$VerifyOtpRequestImplCopyWith<$Res>
   ) = __$$VerifyOtpRequestImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String email, String otp});
+  $Res call({@JsonKey(name: 'identifier') String email, String otp});
 }
 
 /// @nodoc
@@ -520,12 +514,16 @@ class __$$VerifyOtpRequestImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$VerifyOtpRequestImpl implements _VerifyOtpRequest {
-  const _$VerifyOtpRequestImpl({required this.email, required this.otp});
+  const _$VerifyOtpRequestImpl({
+    @JsonKey(name: 'identifier') required this.email,
+    required this.otp,
+  });
 
   factory _$VerifyOtpRequestImpl.fromJson(Map<String, dynamic> json) =>
       _$$VerifyOtpRequestImplFromJson(json);
 
   @override
+  @JsonKey(name: 'identifier')
   final String email;
   @override
   final String otp;
@@ -567,7 +565,7 @@ class _$VerifyOtpRequestImpl implements _VerifyOtpRequest {
 
 abstract class _VerifyOtpRequest implements VerifyOtpRequest {
   const factory _VerifyOtpRequest({
-    required final String email,
+    @JsonKey(name: 'identifier') required final String email,
     required final String otp,
   }) = _$VerifyOtpRequestImpl;
 
@@ -575,6 +573,7 @@ abstract class _VerifyOtpRequest implements VerifyOtpRequest {
       _$VerifyOtpRequestImpl.fromJson;
 
   @override
+  @JsonKey(name: 'identifier')
   String get email;
   @override
   String get otp;
@@ -757,7 +756,6 @@ ResetPasswordRequest _$ResetPasswordRequestFromJson(Map<String, dynamic> json) {
 mixin _$ResetPasswordRequest {
   String get email => throw _privateConstructorUsedError;
   String get otp => throw _privateConstructorUsedError;
-  @JsonKey(name: 'new_password')
   String get newPassword => throw _privateConstructorUsedError;
 
   /// Serializes this ResetPasswordRequest to a JSON map.
@@ -777,11 +775,7 @@ abstract class $ResetPasswordRequestCopyWith<$Res> {
     $Res Function(ResetPasswordRequest) then,
   ) = _$ResetPasswordRequestCopyWithImpl<$Res, ResetPasswordRequest>;
   @useResult
-  $Res call({
-    String email,
-    String otp,
-    @JsonKey(name: 'new_password') String newPassword,
-  });
+  $Res call({String email, String otp, String newPassword});
 }
 
 /// @nodoc
@@ -835,11 +829,7 @@ abstract class _$$ResetPasswordRequestImplCopyWith<$Res>
   ) = __$$ResetPasswordRequestImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    String email,
-    String otp,
-    @JsonKey(name: 'new_password') String newPassword,
-  });
+  $Res call({String email, String otp, String newPassword});
 }
 
 /// @nodoc
@@ -885,7 +875,7 @@ class _$ResetPasswordRequestImpl implements _ResetPasswordRequest {
   const _$ResetPasswordRequestImpl({
     required this.email,
     required this.otp,
-    @JsonKey(name: 'new_password') required this.newPassword,
+    required this.newPassword,
   });
 
   factory _$ResetPasswordRequestImpl.fromJson(Map<String, dynamic> json) =>
@@ -896,7 +886,6 @@ class _$ResetPasswordRequestImpl implements _ResetPasswordRequest {
   @override
   final String otp;
   @override
-  @JsonKey(name: 'new_password')
   final String newPassword;
 
   @override
@@ -941,7 +930,7 @@ abstract class _ResetPasswordRequest implements ResetPasswordRequest {
   const factory _ResetPasswordRequest({
     required final String email,
     required final String otp,
-    @JsonKey(name: 'new_password') required final String newPassword,
+    required final String newPassword,
   }) = _$ResetPasswordRequestImpl;
 
   factory _ResetPasswordRequest.fromJson(Map<String, dynamic> json) =
@@ -952,7 +941,6 @@ abstract class _ResetPasswordRequest implements ResetPasswordRequest {
   @override
   String get otp;
   @override
-  @JsonKey(name: 'new_password')
   String get newPassword;
 
   /// Create a copy of ResetPasswordRequest
@@ -969,9 +957,7 @@ AuthResponse _$AuthResponseFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$AuthResponse {
-  @JsonKey(name: 'access_token')
   String get accessToken => throw _privateConstructorUsedError;
-  @JsonKey(name: 'refresh_token')
   String get refreshToken => throw _privateConstructorUsedError;
   User get user => throw _privateConstructorUsedError;
 
@@ -992,11 +978,7 @@ abstract class $AuthResponseCopyWith<$Res> {
     $Res Function(AuthResponse) then,
   ) = _$AuthResponseCopyWithImpl<$Res, AuthResponse>;
   @useResult
-  $Res call({
-    @JsonKey(name: 'access_token') String accessToken,
-    @JsonKey(name: 'refresh_token') String refreshToken,
-    User user,
-  });
+  $Res call({String accessToken, String refreshToken, User user});
 
   $UserCopyWith<$Res> get user;
 }
@@ -1059,11 +1041,7 @@ abstract class _$$AuthResponseImplCopyWith<$Res>
   ) = __$$AuthResponseImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({
-    @JsonKey(name: 'access_token') String accessToken,
-    @JsonKey(name: 'refresh_token') String refreshToken,
-    User user,
-  });
+  $Res call({String accessToken, String refreshToken, User user});
 
   @override
   $UserCopyWith<$Res> get user;
@@ -1110,8 +1088,8 @@ class __$$AuthResponseImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$AuthResponseImpl implements _AuthResponse {
   const _$AuthResponseImpl({
-    @JsonKey(name: 'access_token') required this.accessToken,
-    @JsonKey(name: 'refresh_token') required this.refreshToken,
+    required this.accessToken,
+    required this.refreshToken,
     required this.user,
   });
 
@@ -1119,10 +1097,8 @@ class _$AuthResponseImpl implements _AuthResponse {
       _$$AuthResponseImplFromJson(json);
 
   @override
-  @JsonKey(name: 'access_token')
   final String accessToken;
   @override
-  @JsonKey(name: 'refresh_token')
   final String refreshToken;
   @override
   final User user;
@@ -1164,8 +1140,8 @@ class _$AuthResponseImpl implements _AuthResponse {
 
 abstract class _AuthResponse implements AuthResponse {
   const factory _AuthResponse({
-    @JsonKey(name: 'access_token') required final String accessToken,
-    @JsonKey(name: 'refresh_token') required final String refreshToken,
+    required final String accessToken,
+    required final String refreshToken,
     required final User user,
   }) = _$AuthResponseImpl;
 
@@ -1173,10 +1149,8 @@ abstract class _AuthResponse implements AuthResponse {
       _$AuthResponseImpl.fromJson;
 
   @override
-  @JsonKey(name: 'access_token')
   String get accessToken;
   @override
-  @JsonKey(name: 'refresh_token')
   String get refreshToken;
   @override
   User get user;
