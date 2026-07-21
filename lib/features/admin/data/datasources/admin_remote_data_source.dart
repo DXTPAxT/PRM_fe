@@ -57,7 +57,7 @@ class AdminRemoteDataSource {
   }
 
   Future<ApiResponse<Order>> updateOrderStatus(String id, String status) async {
-    final response = await _dioClient.patch('/admin/orders/$id', data: {'status': status});
+    final response = await _dioClient.patch('/admin/orders/$id/status', data: {'status': status});
     return ApiResponse<Order>.fromJson(
       response.data as Map<String, dynamic>,
       (json) => Order.fromJson(json as Map<String, dynamic>),

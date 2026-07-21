@@ -56,6 +56,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       // Authenticated state redirection
       if (status == AuthStatus.authenticated) {
         if (isSplash || isAuthRoute) {
+          if (authState.user?.role == 'admin') {
+            return '/admin';
+          }
           return '/';
         }
 

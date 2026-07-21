@@ -64,6 +64,7 @@ class AdminDashboardTab extends ConsumerWidget {
   }
 
   Widget _buildStatCards(dynamic summary) {
+    final double revenue = (summary.totalRevenue ?? 0).toDouble();
     return GridView.count(
       crossAxisCount: 2,
       shrinkWrap: true,
@@ -86,7 +87,7 @@ class AdminDashboardTab extends ConsumerWidget {
         ),
         _buildStatCard(
           'Doanh thu',
-          '${_formatCurrency(summary.totalRevenue ?? 0)}',
+          _formatCurrency(revenue),
           Icons.attach_money_outlined,
           Colors.orange,
         ),
@@ -142,11 +143,12 @@ class AdminDashboardTab extends ConsumerWidget {
         itemCount: orders.length,
         itemBuilder: (context, index) {
           final order = orders[index];
+          final double itemTotal = (order.totalPrice ?? order.total ?? 0).toDouble();
           return ListTile(
             leading: const Icon(Icons.receipt_long_outlined),
             title: Text('Đơn #${order.id ?? ''}'),
             subtitle: Text('${order.status ?? 'Chưa xác định'}'),
-            trailing: Text('${_formatCurrency(order.totalPrice ?? 0)}'),
+            trailing: Text(_formatCurrency(itemTotal)),
           );
         },
       ),
