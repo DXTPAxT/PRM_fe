@@ -67,6 +67,12 @@ class CatalogNotifier extends StateNotifier<CatalogState> {
 
   CatalogRepository get _repository => _ref.read(catalogRepositoryProvider);
 
+  bool _isValidUuid(String str) {
+    return RegExp(
+      r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
+    ).hasMatch(str);
+  }
+
   /// Đọc categories từ Hive trước để hiện ngay, rồi mới gọi mạng.
   Future<void> _loadCategories() async {
     final box = HiveCache.getBox(HiveCache.categoriesBoxName);
@@ -78,7 +84,12 @@ class CatalogNotifier extends StateNotifier<CatalogState> {
             .map((item) =>
                 Category.fromJson(Map<String, dynamic>.from(item as Map)))
             .toList();
-        state = state.copyWith(categories: categories);
+        final hasInvalidId = categories.any((c) => !_isValidUuid(c.id));
+        if (!hasInvalidId) {
+          state = state.copyWith(categories: categories);
+        } else {
+          await box.delete('items');
+        }
       } catch (_) {
         await box.delete('items'); // cache hỏng thì bỏ đi, không làm sập app
       }

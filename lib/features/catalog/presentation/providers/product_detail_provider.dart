@@ -79,7 +79,13 @@ class ProductDetailNotifier extends StateNotifier<ProductDetailState> {
     try {
       final product =
           await _ref.read(catalogRepositoryProvider).getProductDetail(productId);
-      state = ProductDetailState(product: product);
+      final firstVariant =
+          product.variants.isNotEmpty ? product.variants.first : null;
+      state = ProductDetailState(
+        product: product,
+        selectedSize: firstVariant?.size,
+        selectedColor: firstVariant?.color,
+      );
     } catch (error) {
       state = state.copyWith(
         isLoading: false,
@@ -88,9 +94,19 @@ class ProductDetailNotifier extends StateNotifier<ProductDetailState> {
     }
   }
 
-  /// Đổi size có thể làm màu đang chọn không còn hợp lệ — bỏ chọn màu luôn.
   void selectSize(String size) {
-    state = state.copyWith(selectedSize: size, clearColor: true);
+    final availableForSize = state.product?.variants
+            .where((v) => v.size == size)
+            .map((v) => v.color)
+            .toList() ??
+        [];
+    final validColor = availableForSize.contains(state.selectedColor)
+        ? state.selectedColor
+        : (availableForSize.isNotEmpty ? availableForSize.first : null);
+    state = state.copyWith(
+      selectedSize: size,
+      selectedColor: validColor,
+    );
   }
 
   void selectColor(String color) {

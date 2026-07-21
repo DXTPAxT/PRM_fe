@@ -13,8 +13,10 @@ _$AddressImpl _$$AddressImplFromJson(Map<String, dynamic> json) =>
       fullName: json['fullName'] as String,
       phone: json['phone'] as String,
       detail: json['detail'] as String,
-      isDefault: json['isDefault'] as bool,
-      createdAt: DateTime.parse(json['createdAt'] as String),
+      isDefault: json['isDefault'] as bool? ?? false,
+      createdAt: json['createdAt'] == null
+          ? null
+          : DateTime.parse(json['createdAt'] as String),
     );
 
 Map<String, dynamic> _$$AddressImplToJson(_$AddressImpl instance) =>
@@ -25,5 +27,5 @@ Map<String, dynamic> _$$AddressImplToJson(_$AddressImpl instance) =>
       'phone': instance.phone,
       'detail': instance.detail,
       'isDefault': instance.isDefault,
-      'createdAt': instance.createdAt.toIso8601String(),
+      'createdAt': instance.createdAt?.toIso8601String(),
     };

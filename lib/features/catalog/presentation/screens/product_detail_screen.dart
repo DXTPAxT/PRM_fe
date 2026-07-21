@@ -6,6 +6,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/common_widgets.dart';
 import '../../../../shared/models/product_variant.dart';
 import '../../../cart/presentation/providers/cart_provider.dart';
+import '../../../wishlist/presentation/providers/wishlist_provider.dart';
 import '../providers/product_detail_provider.dart';
 import '../providers/review_provider.dart';
 import '../widgets/product_card.dart' show formatVnd;
@@ -22,9 +23,31 @@ class ProductDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(productDetailProvider(productId));
     final notifier = ref.read(productDetailProvider(productId).notifier);
+    final isWishlisted = ref.watch(isInWishlistProvider(productId));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Chi tiết sản phẩm')),
+      appBar: AppBar(
+        title: const Text('Chi tiết sản phẩm'),
+        actions: [
+          IconButton(
+            icon: Icon(
+              isWishlisted ? Icons.favorite : Icons.favorite_border,
+              color: isWishlisted ? Colors.red : null,
+            ),
+            tooltip: isWishlisted ? 'Xóa khỏi yêu thích' : 'Thêm vào yêu thích',
+            onPressed: () async {
+              final added = await ref.read(wishlistProvider.notifier).toggle(productId);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text(added
+                      ? 'Đã thêm vào danh sách yêu thích'
+                      : 'Đã xóa khỏi danh sách yêu thích'),
+                ));
+              }
+            },
+          ),
+        ],
+      ),
       body: _buildBody(context, ref, state, notifier),
       bottomNavigationBar: state.product == null
           ? null

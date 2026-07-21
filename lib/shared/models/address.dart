@@ -11,8 +11,8 @@ class Address with _$Address {
     required String fullName,
     required String phone,
     required String detail,
-    required bool isDefault,
-    required DateTime createdAt,
+    @JsonKey(defaultValue: false) @Default(false) bool isDefault,
+    DateTime? createdAt,
   }) = _Address;
 
   factory Address.fromJson(Map<String, dynamic> json) =>

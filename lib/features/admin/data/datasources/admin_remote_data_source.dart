@@ -66,7 +66,7 @@ class AdminRemoteDataSource {
 
   // Vouchers
   Future<ApiResponse<List<Voucher>>> getVouchers() async {
-    final response = await _dioClient.get('/admin/vouchers');
+    final response = await _dioClient.get('/vouchers');
     return ApiResponse<List<Voucher>>.fromJson(
       response.data as Map<String, dynamic>,
       (json) => (json as List<dynamic>)
@@ -76,7 +76,7 @@ class AdminRemoteDataSource {
   }
 
   Future<ApiResponse<Voucher>> createVoucher(Map<String, dynamic> data) async {
-    final response = await _dioClient.post('/admin/vouchers', data: data);
+    final response = await _dioClient.post('/vouchers', data: data);
     return ApiResponse<Voucher>.fromJson(
       response.data as Map<String, dynamic>,
       (json) => Voucher.fromJson(json as Map<String, dynamic>),
@@ -84,7 +84,7 @@ class AdminRemoteDataSource {
   }
 
   Future<ApiResponse<Voucher>> updateVoucher(String id, Map<String, dynamic> data) async {
-    final response = await _dioClient.put('/admin/vouchers/$id', data: data);
+    final response = await _dioClient.put('/vouchers/$id', data: data);
     return ApiResponse<Voucher>.fromJson(
       response.data as Map<String, dynamic>,
       (json) => Voucher.fromJson(json as Map<String, dynamic>),
@@ -92,7 +92,7 @@ class AdminRemoteDataSource {
   }
 
   Future<ApiResponse<void>> deleteVoucher(String id) async {
-    final response = await _dioClient.delete('/admin/vouchers/$id');
+    final response = await _dioClient.delete('/vouchers/$id');
     return ApiResponse<void>.fromJson(
       response.data as Map<String, dynamic>,
       (_) {},
@@ -101,7 +101,7 @@ class AdminRemoteDataSource {
 
   // Reports
   Future<ApiResponse<ReportsSummary>> getReportsSummary() async {
-    final response = await _dioClient.get('/admin/reports/summary');
+    final response = await _dioClient.get('/admin/dashboard');
     return ApiResponse<ReportsSummary>.fromJson(
       response.data as Map<String, dynamic>,
       (json) => ReportsSummary.fromJson(json as Map<String, dynamic>),

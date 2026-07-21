@@ -26,8 +26,9 @@ mixin _$Address {
   String get fullName => throw _privateConstructorUsedError;
   String get phone => throw _privateConstructorUsedError;
   String get detail => throw _privateConstructorUsedError;
+  @JsonKey(defaultValue: false)
   bool get isDefault => throw _privateConstructorUsedError;
-  DateTime get createdAt => throw _privateConstructorUsedError;
+  DateTime? get createdAt => throw _privateConstructorUsedError;
 
   /// Serializes this Address to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -49,8 +50,8 @@ abstract class $AddressCopyWith<$Res> {
     String fullName,
     String phone,
     String detail,
-    bool isDefault,
-    DateTime createdAt,
+    @JsonKey(defaultValue: false) bool isDefault,
+    DateTime? createdAt,
   });
 }
 
@@ -75,7 +76,7 @@ class _$AddressCopyWithImpl<$Res, $Val extends Address>
     Object? phone = null,
     Object? detail = null,
     Object? isDefault = null,
-    Object? createdAt = null,
+    Object? createdAt = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -103,10 +104,10 @@ class _$AddressCopyWithImpl<$Res, $Val extends Address>
                 ? _value.isDefault
                 : isDefault // ignore: cast_nullable_to_non_nullable
                       as bool,
-            createdAt: null == createdAt
+            createdAt: freezed == createdAt
                 ? _value.createdAt
                 : createdAt // ignore: cast_nullable_to_non_nullable
-                      as DateTime,
+                      as DateTime?,
           )
           as $Val,
     );
@@ -127,8 +128,8 @@ abstract class _$$AddressImplCopyWith<$Res> implements $AddressCopyWith<$Res> {
     String fullName,
     String phone,
     String detail,
-    bool isDefault,
-    DateTime createdAt,
+    @JsonKey(defaultValue: false) bool isDefault,
+    DateTime? createdAt,
   });
 }
 
@@ -152,7 +153,7 @@ class __$$AddressImplCopyWithImpl<$Res>
     Object? phone = null,
     Object? detail = null,
     Object? isDefault = null,
-    Object? createdAt = null,
+    Object? createdAt = freezed,
   }) {
     return _then(
       _$AddressImpl(
@@ -180,10 +181,10 @@ class __$$AddressImplCopyWithImpl<$Res>
             ? _value.isDefault
             : isDefault // ignore: cast_nullable_to_non_nullable
                   as bool,
-        createdAt: null == createdAt
+        createdAt: freezed == createdAt
             ? _value.createdAt
             : createdAt // ignore: cast_nullable_to_non_nullable
-                  as DateTime,
+                  as DateTime?,
       ),
     );
   }
@@ -198,8 +199,8 @@ class _$AddressImpl implements _Address {
     required this.fullName,
     required this.phone,
     required this.detail,
-    required this.isDefault,
-    required this.createdAt,
+    @JsonKey(defaultValue: false) this.isDefault = false,
+    this.createdAt,
   });
 
   factory _$AddressImpl.fromJson(Map<String, dynamic> json) =>
@@ -216,9 +217,10 @@ class _$AddressImpl implements _Address {
   @override
   final String detail;
   @override
+  @JsonKey(defaultValue: false)
   final bool isDefault;
   @override
-  final DateTime createdAt;
+  final DateTime? createdAt;
 
   @override
   String toString() {
@@ -276,8 +278,8 @@ abstract class _Address implements Address {
     required final String fullName,
     required final String phone,
     required final String detail,
-    required final bool isDefault,
-    required final DateTime createdAt,
+    @JsonKey(defaultValue: false) final bool isDefault,
+    final DateTime? createdAt,
   }) = _$AddressImpl;
 
   factory _Address.fromJson(Map<String, dynamic> json) = _$AddressImpl.fromJson;
@@ -293,9 +295,10 @@ abstract class _Address implements Address {
   @override
   String get detail;
   @override
+  @JsonKey(defaultValue: false)
   bool get isDefault;
   @override
-  DateTime get createdAt;
+  DateTime? get createdAt;
 
   /// Create a copy of Address
   /// with the given fields replaced by the non-null parameter values.

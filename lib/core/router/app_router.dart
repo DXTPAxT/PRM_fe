@@ -19,6 +19,8 @@ import '../../features/admin/presentation/screens/admin_screen.dart';
 import '../../features/catalog/presentation/screens/product_detail_screen.dart';
 import '../../features/checkout/presentation/screens/checkout_screen.dart';
 import '../../features/orders/presentation/screens/order_detail_screen.dart';
+import '../../features/wishlist/presentation/screens/wishlist_screen.dart';
+import '../../features/notifications/presentation/screens/notifications_screen.dart';
 
 import '../../features/auth/presentation/providers/auth_provider.dart';
 import '../../features/cart/presentation/providers/cart_provider.dart';
@@ -116,6 +118,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => OrderDetailScreen(
           orderId: state.pathParameters['id']!,
         ),
+      ),
+      GoRoute(
+        path: '/wishlist',
+        builder: (context, state) => const WishlistScreen(),
+      ),
+      GoRoute(
+        path: '/notifications',
+        builder: (context, state) => const NotificationsScreen(),
       ),
       // Bottom Navigation shell route
       StatefulShellRoute.indexedStack(
