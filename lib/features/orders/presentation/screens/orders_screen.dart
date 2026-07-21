@@ -18,8 +18,10 @@ class _OrderTab {
 const _tabs = <_OrderTab>[
   _OrderTab('Tất cả', null),
   _OrderTab('Chờ thanh toán', 'pending_payment'),
-  _OrderTab('Đang xử lý', 'confirmed'),
+  _OrderTab('Đã xác nhận', 'confirmed'),
+  _OrderTab('Đang đóng gói', 'packed'),
   _OrderTab('Đang giao', 'shipping'),
+  _OrderTab('Đã giao', 'delivered'),
   _OrderTab('Hoàn thành', 'completed'),
   _OrderTab('Đã hủy', 'cancelled'),
 ];
