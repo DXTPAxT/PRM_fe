@@ -18,6 +18,13 @@ import '../../data/models/otp_models.dart';
 
 enum AuthStatus { initial, unauthenticated, authenticated }
 
+class AuthActionResult {
+  final bool isSuccess;
+  final String message;
+
+  const AuthActionResult({required this.isSuccess, required this.message});
+}
+
 class AuthState {
   final AuthStatus status;
   final User? user;
@@ -205,25 +212,24 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  Future<void> forgotPassword(String email) async {
+  Future<AuthActionResult> forgotPassword(String email) async {
     state = AuthState.loading(pendingIdentifier: email);
     try {
       final forgotPasswordUseCase = _ref.read(forgotPasswordUseCaseProvider);
       await forgotPasswordUseCase(email: email);
-      state = AuthState.unauthenticated(
-        error:
+      state = AuthState.unauthenticated(pendingIdentifier: email);
+      return const AuthActionResult(
+        isSuccess: true,
+        message:
             'OTP đã được gửi nếu thông tin tồn tại. Vui lòng kiểm tra email.',
-        pendingIdentifier: email,
       );
     } catch (e) {
-      state = AuthState.unauthenticated(
-        error: e.toString(),
-        pendingIdentifier: email,
-      );
+      state = AuthState.unauthenticated(pendingIdentifier: email);
+      return AuthActionResult(isSuccess: false, message: _cleanErrorMessage(e));
     }
   }
 
-  Future<void> resetPassword(
+  Future<AuthActionResult> resetPassword(
     String email,
     String otp,
     String newPassword,
@@ -236,16 +242,19 @@ class AuthNotifier extends StateNotifier<AuthState> {
         otp: otp,
         newPassword: newPassword,
       );
-      state = AuthState.unauthenticated(
-        error: 'Đổi mật khẩu thành công. Vui lòng đăng nhập.',
-        pendingIdentifier: email,
+      state = AuthState.unauthenticated(pendingIdentifier: email);
+      return const AuthActionResult(
+        isSuccess: true,
+        message: 'Đổi mật khẩu thành công. Vui lòng đăng nhập.',
       );
     } catch (e) {
-      state = AuthState.unauthenticated(
-        error: e.toString(),
-        pendingIdentifier: email,
-      );
+      state = AuthState.unauthenticated(pendingIdentifier: email);
+      return AuthActionResult(isSuccess: false, message: _cleanErrorMessage(e));
     }
+  }
+
+  String _cleanErrorMessage(Object error) {
+    return error.toString().replaceFirst(RegExp(r'^Exception:\s*'), '');
   }
 
   Future<void> setAuthenticatedUser(
