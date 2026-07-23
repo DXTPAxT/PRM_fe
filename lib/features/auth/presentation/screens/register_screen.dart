@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/utils/password_validator.dart';
 import '../providers/auth_provider.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -144,12 +145,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     labelText: 'Mật khẩu',
                     prefixIcon: Icon(Icons.lock_outline),
                   ),
-                  validator: (value) {
-                    if (value == null || value.length < 8) {
-                      return 'Mật khẩu phải có ít nhất 8 ký tự';
-                    }
-                    return null;
-                  },
+                  validator: validateStrongPassword,
                 ),
                 const SizedBox(height: 28),
                 if (authState.isLoading)

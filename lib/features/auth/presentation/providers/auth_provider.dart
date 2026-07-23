@@ -284,6 +284,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
     await HiveCache.clearAll();
     state = AuthState.unauthenticated();
   }
+
+  void handleSessionExpired() {
+    state = AuthState.unauthenticated();
+  }
 }
 
 // Secure Storage Provider
@@ -297,7 +301,7 @@ final dioClientProvider = Provider<DioClient>((ref) {
   return DioClient(
     secureStorage: secureStorage,
     onLogout: () {
-      ref.read(authProvider.notifier).logout();
+      ref.read(authProvider.notifier).handleSessionExpired();
     },
   );
 });

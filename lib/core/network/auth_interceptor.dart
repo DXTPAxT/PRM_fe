@@ -6,14 +6,17 @@ class AuthInterceptor extends QueuedInterceptor {
   final SecureStorage _secureStorage;
   final Dio _refreshDio;
   final void Function()? _onLogout;
+  final Future<void> Function() _clearCache;
 
   AuthInterceptor({
     required SecureStorage secureStorage,
     required Dio refreshDio,
     void Function()? onLogout,
+    Future<void> Function()? clearCache,
   }) : _secureStorage = secureStorage,
        _refreshDio = refreshDio,
-       _onLogout = onLogout;
+       _onLogout = onLogout,
+       _clearCache = clearCache ?? HiveCache.clearAll;
 
   @override
   void onRequest(
@@ -33,11 +36,8 @@ class AuthInterceptor extends QueuedInterceptor {
         !_isAuthEndpoint(err.requestOptions.path)) {
       final refreshToken = await _secureStorage.getRefreshToken();
       if (refreshToken != null && refreshToken.isNotEmpty) {
+        String? newAccessToken;
         try {
-          // Perform refresh token request
-          // Note: [Backend Contract Required]
-          // The actual refresh URL and body parameters must match the backend specification.
-          // Example placeholder: POST /auth/refresh with body parameters.
           final response = await _refreshDio.post(
             '/auth/refresh',
             data: {'refreshToken': refreshToken},
@@ -51,53 +51,52 @@ class AuthInterceptor extends QueuedInterceptor {
                 : responseData is Map
                 ? responseData
                 : const <String, dynamic>{};
-            final newAccessToken = tokenData['accessToken'];
+            final accessToken = tokenData['accessToken'];
             final newRefreshToken = tokenData['refreshToken'];
 
-            if (newAccessToken != null) {
-              await _secureStorage.saveAccessToken(newAccessToken);
-              if (newRefreshToken != null) {
-                await _secureStorage.saveRefreshToken(newRefreshToken);
-              }
-
-              // Retry original request with updated authorization header
-              final options = err.requestOptions;
-              options.headers['Authorization'] = 'Bearer $newAccessToken';
-
-              final cloneDio = Dio(
-                BaseOptions(
-                  baseUrl: options.baseUrl,
-                  headers: options.headers,
-                  connectTimeout: options.connectTimeout,
-                  receiveTimeout: options.receiveTimeout,
-                ),
-              );
-
-              final responseClone = await cloneDio.request(
-                options.path,
-                data: options.data,
-                queryParameters: options.queryParameters,
-                options: Options(
-                  method: options.method,
-                  headers: options.headers,
-                ),
-              );
-
-              return handler.resolve(responseClone);
+            if (accessToken is String &&
+                accessToken.isNotEmpty &&
+                newRefreshToken is String &&
+                newRefreshToken.isNotEmpty) {
+              newAccessToken = accessToken;
+              await _secureStorage.saveAccessToken(accessToken);
+              await _secureStorage.saveRefreshToken(newRefreshToken);
             }
           }
         } catch (_) {
-          // Refresh flow failed or timed out
+          await _clearSession();
+          return super.onError(err, handler);
+        }
+
+        if (newAccessToken != null) {
+          final options = err.requestOptions;
+          options.headers['Authorization'] = 'Bearer $newAccessToken';
+
+          try {
+            final responseClone = await _refreshDio.fetch(options);
+            return handler.resolve(responseClone);
+          } on DioException catch (retryError) {
+            // Refresh succeeded, so this is an application/request error.
+            // Preserve the authenticated session and surface it to the caller.
+            return handler.reject(retryError);
+          } catch (_) {
+            return super.onError(err, handler);
+          }
         }
       }
 
-      // If no refresh token or refresh failed, perform logout
-      await _secureStorage.clearTokens();
-      await HiveCache.clearAll();
-      _onLogout?.call();
+      // Missing or malformed refresh credentials mean the session is no longer
+      // recoverable.
+      await _clearSession();
     }
 
     super.onError(err, handler);
+  }
+
+  Future<void> _clearSession() async {
+    await _secureStorage.clearTokens();
+    await _clearCache();
+    _onLogout?.call();
   }
 
   bool _isAuthEndpoint(String path) {

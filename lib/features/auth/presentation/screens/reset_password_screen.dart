@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/utils/password_validator.dart';
 import '../providers/auth_provider.dart';
 
 class ResetPasswordScreen extends ConsumerStatefulWidget {
@@ -121,15 +122,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                   hintText: 'Nhập mật khẩu mới',
                   prefixIcon: Icon(Icons.lock_outline),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Vui lòng nhập mật khẩu';
-                  }
-                  if (value.length < 8) {
-                    return 'Mật khẩu phải từ 8 ký tự trở lên';
-                  }
-                  return null;
-                },
+                validator: validateStrongPassword,
               ),
               const SizedBox(height: 32),
               if (authState.isLoading)

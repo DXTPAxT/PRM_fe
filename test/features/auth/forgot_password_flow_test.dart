@@ -169,4 +169,26 @@ void main() {
     );
     expect(find.byType(LoginScreen), findsOneWidget);
   });
+
+  testWidgets('reset password rejects a password without an uppercase letter', (
+    tester,
+  ) async {
+    final repository = _FakeAuthRepository();
+    final router = _router(initialLocation: '/reset-password');
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(_app(repository: repository, router: router));
+    await tester.pumpAndSettle();
+
+    final fields = find.byType(TextFormField);
+    await tester.enterText(fields.at(0), 'customer1@clothing.dev');
+    await tester.enterText(fields.at(1), '123456');
+    await tester.enterText(fields.at(2), 'password1!');
+    await tester.tap(find.text('Cập nhật mật khẩu'));
+    await tester.pump();
+
+    expect(repository.resetPasswordCalls, 0);
+    expect(find.text('Mật khẩu phải có ít nhất 1 chữ hoa'), findsOneWidget);
+    expect(find.byType(ResetPasswordScreen), findsOneWidget);
+  });
 }
