@@ -1,6 +1,7 @@
 import '../../../../shared/models/order.dart';
 import '../../../../shared/models/product.dart';
 import '../../../../shared/models/voucher.dart';
+import '../../../../shared/models/admin/admin_user.dart';
 import '../../../../shared/models/admin/reports_summary.dart';
 import '../../domain/repositories/admin_repository.dart';
 import '../datasources/admin_remote_data_source.dart';
@@ -51,6 +52,27 @@ class AdminRepositoryImpl implements AdminRepository {
     final response = await _remoteDataSource.updateOrderStatus(id, status);
     if (response.success && response.data != null) return response.data!;
     throw Exception(response.message ?? 'Cập nhật trạng thái đơn hàng thất bại.');
+  }
+
+  @override
+  Future<List<AdminUser>> getUsers() async {
+    final response = await _remoteDataSource.getUsers();
+    if (response.success && response.data != null) return response.data!;
+    throw Exception(response.message ?? 'Không thể tải danh sách người dùng.');
+  }
+
+  @override
+  Future<AdminUser> updateUserRole(String id, String role) async {
+    final response = await _remoteDataSource.updateUserRole(id, role);
+    if (response.success && response.data != null) return response.data!;
+    throw Exception(response.message ?? 'Cập nhật vai trò thất bại.');
+  }
+
+  @override
+  Future<AdminUser> toggleUserActive(String id) async {
+    final response = await _remoteDataSource.toggleUserActive(id);
+    if (response.success && response.data != null) return response.data!;
+    throw Exception(response.message ?? 'Thay đổi trạng thái thất bại.');
   }
 
   @override

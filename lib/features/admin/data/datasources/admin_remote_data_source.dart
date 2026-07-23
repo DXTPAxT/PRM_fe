@@ -3,6 +3,7 @@ import '../../../../core/network/dio_client.dart';
 import '../../../../shared/models/order.dart';
 import '../../../../shared/models/product.dart';
 import '../../../../shared/models/voucher.dart';
+import '../../../../shared/models/admin/admin_user.dart';
 import '../../../../shared/models/admin/reports_summary.dart';
 
 class AdminRemoteDataSource {
@@ -10,7 +11,7 @@ class AdminRemoteDataSource {
 
   AdminRemoteDataSource(this._dioClient);
 
-  // Products
+  // ── Products ─────────────────────────────────────────────────────────────
   Future<ApiResponse<List<Product>>> getProducts() async {
     final response = await _dioClient.get('/products');
     return ApiResponse<List<Product>>.fromJson(
@@ -45,7 +46,7 @@ class AdminRemoteDataSource {
     );
   }
 
-  // Orders
+  // ── Orders ───────────────────────────────────────────────────────────────
   Future<ApiResponse<List<Order>>> getOrders() async {
     final response = await _dioClient.get('/admin/orders');
     return ApiResponse<List<Order>>.fromJson(
@@ -57,16 +58,43 @@ class AdminRemoteDataSource {
   }
 
   Future<ApiResponse<Order>> updateOrderStatus(String id, String status) async {
-    final response = await _dioClient.patch('/admin/orders/$id', data: {'status': status});
+    final response = await _dioClient.patch('/admin/orders/$id/status', data: {'status': status});
     return ApiResponse<Order>.fromJson(
       response.data as Map<String, dynamic>,
       (json) => Order.fromJson(json as Map<String, dynamic>),
     );
   }
 
-  // Vouchers
+  // ── Users ────────────────────────────────────────────────────────────────
+  Future<ApiResponse<List<AdminUser>>> getUsers() async {
+    final response = await _dioClient.get('/admin/users');
+    return ApiResponse<List<AdminUser>>.fromJson(
+      response.data as Map<String, dynamic>,
+      (json) => (json as List<dynamic>)
+          .map((item) => AdminUser.fromJson(item as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  Future<ApiResponse<AdminUser>> updateUserRole(String id, String role) async {
+    final response = await _dioClient.put('/admin/users/$id/role', data: {'role': role});
+    return ApiResponse<AdminUser>.fromJson(
+      response.data as Map<String, dynamic>,
+      (json) => AdminUser.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  Future<ApiResponse<AdminUser>> toggleUserActive(String id) async {
+    final response = await _dioClient.patch('/admin/users/$id/toggle-active');
+    return ApiResponse<AdminUser>.fromJson(
+      response.data as Map<String, dynamic>,
+      (json) => AdminUser.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  // ── Vouchers ─────────────────────────────────────────────────────────────
   Future<ApiResponse<List<Voucher>>> getVouchers() async {
-    final response = await _dioClient.get('/admin/vouchers');
+    final response = await _dioClient.get('/vouchers');
     return ApiResponse<List<Voucher>>.fromJson(
       response.data as Map<String, dynamic>,
       (json) => (json as List<dynamic>)
@@ -76,7 +104,7 @@ class AdminRemoteDataSource {
   }
 
   Future<ApiResponse<Voucher>> createVoucher(Map<String, dynamic> data) async {
-    final response = await _dioClient.post('/admin/vouchers', data: data);
+    final response = await _dioClient.post('/vouchers', data: data);
     return ApiResponse<Voucher>.fromJson(
       response.data as Map<String, dynamic>,
       (json) => Voucher.fromJson(json as Map<String, dynamic>),
@@ -84,7 +112,7 @@ class AdminRemoteDataSource {
   }
 
   Future<ApiResponse<Voucher>> updateVoucher(String id, Map<String, dynamic> data) async {
-    final response = await _dioClient.put('/admin/vouchers/$id', data: data);
+    final response = await _dioClient.patch('/vouchers/$id', data: data);
     return ApiResponse<Voucher>.fromJson(
       response.data as Map<String, dynamic>,
       (json) => Voucher.fromJson(json as Map<String, dynamic>),
@@ -92,16 +120,16 @@ class AdminRemoteDataSource {
   }
 
   Future<ApiResponse<void>> deleteVoucher(String id) async {
-    final response = await _dioClient.delete('/admin/vouchers/$id');
+    final response = await _dioClient.delete('/vouchers/$id');
     return ApiResponse<void>.fromJson(
       response.data as Map<String, dynamic>,
       (_) {},
     );
   }
 
-  // Reports
+  // ── Dashboard / Reports ──────────────────────────────────────────────────
   Future<ApiResponse<ReportsSummary>> getReportsSummary() async {
-    final response = await _dioClient.get('/admin/reports/summary');
+    final response = await _dioClient.get('/admin/dashboard');
     return ApiResponse<ReportsSummary>.fromJson(
       response.data as Map<String, dynamic>,
       (json) => ReportsSummary.fromJson(json as Map<String, dynamic>),

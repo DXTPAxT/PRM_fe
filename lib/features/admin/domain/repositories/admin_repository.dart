@@ -1,6 +1,7 @@
 import '../../../../shared/models/order.dart';
 import '../../../../shared/models/product.dart';
 import '../../../../shared/models/voucher.dart';
+import '../../../../shared/models/admin/admin_user.dart';
 import '../../../../shared/models/admin/reports_summary.dart';
 
 abstract class AdminRepository {
@@ -13,6 +14,11 @@ abstract class AdminRepository {
   // Orders
   Future<List<Order>> getOrders();
   Future<Order> updateOrderStatus(String id, String status);
+
+  // Users
+  Future<List<AdminUser>> getUsers();
+  Future<AdminUser> updateUserRole(String id, String role);
+  Future<AdminUser> toggleUserActive(String id);
 
   // Vouchers
   Future<List<Voucher>> getVouchers();
