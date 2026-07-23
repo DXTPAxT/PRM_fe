@@ -3,6 +3,7 @@ import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../../shared/models/product.dart';
 import '../../../../shared/models/order.dart';
 import '../../../../shared/models/voucher.dart';
+import '../../../../shared/models/admin/admin_user.dart';
 import '../../../../shared/models/admin/reports_summary.dart';
 import '../../data/datasources/admin_remote_data_source.dart';
 import '../../data/repositories/admin_repository_impl.dart';
@@ -168,6 +169,64 @@ class AdminProductsNotifier extends StateNotifier<AdminProductsState> {
       await loadProducts(); // Reload products
     } catch (e) {
       state = AdminProductsState(products: state.products, error: e.toString());
+    }
+  }
+}
+
+// Admin Users State
+class AdminUsersState {
+  final List<AdminUser> users;
+  final bool isLoading;
+  final String? error;
+
+  const AdminUsersState({
+    this.users = const [],
+    this.isLoading = false,
+    this.error,
+  });
+}
+
+// Admin Users Provider
+final adminUsersProvider =
+    StateNotifierProvider<AdminUsersNotifier, AdminUsersState>((ref) {
+  return AdminUsersNotifier(ref);
+});
+
+class AdminUsersNotifier extends StateNotifier<AdminUsersState> {
+  final Ref _ref;
+
+  AdminUsersNotifier(this._ref) : super(const AdminUsersState()) {
+    loadUsers();
+  }
+
+  Future<void> loadUsers() async {
+    state = const AdminUsersState(isLoading: true);
+    try {
+      final repository = _ref.read(adminRepositoryProvider);
+      final users = await repository.getUsers();
+      state = AdminUsersState(users: users);
+    } catch (e) {
+      state = AdminUsersState(error: e.toString());
+    }
+  }
+
+  Future<void> updateUserRole(String userId, String role) async {
+    try {
+      final repository = _ref.read(adminRepositoryProvider);
+      await repository.updateUserRole(userId, role);
+      await loadUsers();
+    } catch (e) {
+      state = AdminUsersState(users: state.users, error: e.toString());
+    }
+  }
+
+  Future<void> toggleUserActive(String userId) async {
+    try {
+      final repository = _ref.read(adminRepositoryProvider);
+      await repository.toggleUserActive(userId);
+      await loadUsers();
+    } catch (e) {
+      state = AdminUsersState(users: state.users, error: e.toString());
     }
   }
 }

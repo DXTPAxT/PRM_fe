@@ -57,12 +57,32 @@ class AdminVouchersTab extends ConsumerWidget {
           return Card(
             margin: const EdgeInsets.only(bottom: 12),
             child: ListTile(
-              leading: const Icon(Icons.local_offer_outlined),
-              title: Text(voucher.code),
-              subtitle: Text('Giảm ${_formatDiscount(voucher.discount)}'),
+              leading: Icon(
+                Icons.local_offer_outlined,
+                color: voucher.isActive ? Colors.green : Colors.grey,
+              ),
+              title: Text(
+                voucher.code,
+                style: TextStyle(
+                  decoration: voucher.isActive ? null : TextDecoration.lineThrough,
+                  color: voucher.isActive ? null : Colors.grey,
+                ),
+              ),
+              subtitle: Text(
+                'Giảm ${_formatDiscount(voucher.discount)} · ${voucher.isActive ? "Đang bật" : "Đã tắt"}',
+              ),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  Switch(
+                    value: voucher.isActive,
+                    onChanged: (_) {
+                      ref.read(adminVouchersProvider.notifier).updateVoucher(
+                        voucher.id,
+                        {'isActive': !voucher.isActive},
+                      );
+                    },
+                  ),
                   IconButton(
                     icon: const Icon(Icons.edit_outlined),
                     onPressed: () => _showEditVoucherDialog(context, ref, voucher),
