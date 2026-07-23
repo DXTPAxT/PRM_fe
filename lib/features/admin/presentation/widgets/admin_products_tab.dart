@@ -74,7 +74,7 @@ class _AdminProductsTabState extends ConsumerState<AdminProductsTab> {
             child: ListTile(
               leading: const Icon(Icons.inventory_2_outlined),
               title: Text(product.name),
-              subtitle: Text('${product.price.toStringAsFixed(0)} VNĐ'),
+              subtitle: Text('${product.basePrice.toStringAsFixed(0)} VNĐ'),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -165,7 +165,7 @@ class _AdminProductsTabState extends ConsumerState<AdminProductsTab> {
   void _showEditProductDialog(BuildContext context, Product product) {
     final nameController = TextEditingController(text: product.name);
     final priceController =
-        TextEditingController(text: product.price.toString());
+        TextEditingController(text: product.basePrice.toString());
     final descController =
         TextEditingController(text: product.description);
 
