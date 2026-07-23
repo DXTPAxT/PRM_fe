@@ -189,6 +189,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     child: Column(
                       children: [
                         ListTile(
+                          leading: const Icon(Icons.favorite_outline),
+                          title: const Text('Sản phẩm yêu thích'),
+                          subtitle: const Text('Danh sách sản phẩm đã lưu'),
+                          onTap: () => context.push('/wishlist'),
+                        ),
+                        const Divider(height: 1),
+                        ListTile(
+                          leading: const Icon(Icons.notifications_outlined),
+                          title: const Text('Thông báo'),
+                          subtitle: const Text('Xem lịch sử thông báo'),
+                          onTap: () => context.push('/notifications'),
+                        ),
+                        const Divider(height: 1),
+                        ListTile(
                           leading: const Icon(Icons.location_on_outlined),
                           title: const Text('Sổ địa chỉ'),
                           subtitle: const Text('Quản lý địa chỉ giao hàng'),

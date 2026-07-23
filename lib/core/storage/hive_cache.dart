@@ -9,9 +9,13 @@ class HiveCache {
 
   static Future<void> init() async {
     await Hive.initFlutter();
-    await Hive.openBox(categoriesBoxName);
-    await Hive.openBox(homeProductsBoxName);
+    final catBox = await Hive.openBox(categoriesBoxName);
+    final prodBox = await Hive.openBox(homeProductsBoxName);
     await Hive.openBox(profileBoxName);
+    
+    // Xóa bộ nhớ cache cũ nếu chứa ID không hợp lệ (slug cũ)
+    await catBox.clear();
+    await prodBox.clear();
   }
 
   static Box getBox(String name) {

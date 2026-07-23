@@ -62,10 +62,12 @@ class AdminOrdersTab extends ConsumerWidget {
                       ref.read(adminOrdersProvider.notifier).updateOrderStatus(order.id, status);
                     },
                     itemBuilder: (context) => [
-                      const PopupMenuItem(value: 'pending', child: Text('Chờ xử lý')),
+                      const PopupMenuItem(value: 'pending_payment', child: Text('Chờ thanh toán')),
                       const PopupMenuItem(value: 'confirmed', child: Text('Đã xác nhận')),
-                      const PopupMenuItem(value: 'shipped', child: Text('Đang giao')),
+                      const PopupMenuItem(value: 'packed', child: Text('Đã đóng gói')),
+                      const PopupMenuItem(value: 'shipping', child: Text('Đang giao')),
                       const PopupMenuItem(value: 'delivered', child: Text('Đã giao')),
+                      const PopupMenuItem(value: 'completed', child: Text('Hoàn thành')),
                       const PopupMenuItem(value: 'cancelled', child: Text('Đã hủy')),
                     ],
                   ),
@@ -80,14 +82,18 @@ class AdminOrdersTab extends ConsumerWidget {
 
   String _mapStatus(String status) {
     switch (status) {
-      case 'pending':
-        return 'Chờ xử lý';
+      case 'pending_payment':
+        return 'Chờ thanh toán';
       case 'confirmed':
         return 'Đã xác nhận';
-      case 'shipped':
+      case 'packed':
+        return 'Đã đóng gói';
+      case 'shipping':
         return 'Đang giao';
       case 'delivered':
         return 'Đã giao';
+      case 'completed':
+        return 'Hoàn thành';
       case 'cancelled':
         return 'Đã hủy';
       default:
