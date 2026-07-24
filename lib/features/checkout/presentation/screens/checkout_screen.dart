@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -5,6 +6,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../core/widgets/common_widgets.dart';
+import '../../../../shared/models/voucher.dart';
+import '../../../admin/presentation/providers/admin_provider.dart';
 import '../../../cart/presentation/providers/cart_provider.dart';
 import '../../../profile/presentation/providers/address_provider.dart';
 import '../providers/checkout_provider.dart';
@@ -42,6 +45,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     final addressState = ref.watch(addressProvider);
     final checkout = ref.watch(checkoutProvider);
 
+    final subtotal = cart.subtotal;
+    final discount = checkout.selectedVoucher?.discount ?? 0.0;
+    final finalTotal = math.max(0.0, subtotal - discount);
+
     // Khi địa chỉ vừa load xong, tự chọn mặc định.
     ref.listen(addressProvider.select((s) => s.addresses.length), (_, __) {
       _preselectAddress();
@@ -69,17 +76,27 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                 const _SectionTitle('Địa chỉ giao hàng'),
                 _AddressSection(state: addressState, checkout: checkout),
                 const SizedBox(height: AppTheme.spaceL),
+                const _SectionTitle('Mã giảm giá (Voucher)'),
+                _VoucherSection(
+                  subtotal: subtotal,
+                  selectedVoucher: checkout.selectedVoucher,
+                ),
+                const SizedBox(height: AppTheme.spaceL),
                 const _SectionTitle('Phương thức thanh toán'),
                 _PaymentSection(selected: checkout.paymentMethod),
                 const SizedBox(height: AppTheme.spaceL),
                 const _SectionTitle('Tóm tắt đơn hàng'),
-                _OrderSummary(subtotal: cart.subtotal, itemCount: cart.itemCount),
+                _OrderSummary(
+                  subtotal: subtotal,
+                  discount: discount,
+                  itemCount: cart.itemCount,
+                ),
               ],
             ),
       bottomNavigationBar: cart.isEmpty
           ? null
           : _PlaceOrderBar(
-              total: cart.subtotal,
+              total: finalTotal,
               isSubmitting: checkout.isSubmitting,
               enabled: checkout.selectedAddressId != null,
               onPlaceOrder: _placeOrder,
@@ -233,6 +250,236 @@ class _AddressSection extends ConsumerWidget {
   }
 }
 
+class _VoucherSection extends ConsumerWidget {
+  final double subtotal;
+  final Voucher? selectedVoucher;
+
+  const _VoucherSection({
+    required this.subtotal,
+    required this.selectedVoucher,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(AppTheme.spaceM),
+        child: Row(
+          children: [
+            const Icon(Icons.local_offer_outlined, color: Colors.orange),
+            const SizedBox(width: 12),
+            Expanded(
+              child: selectedVoucher != null
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Mã: ${selectedVoucher!.code}',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          'Giảm ${formatVnd(selectedVoucher!.discount)}',
+                          style: const TextStyle(
+                            color: Colors.green,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    )
+                  : const Text(
+                      'Chọn hoặc nhập mã giảm giá',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+            ),
+            if (selectedVoucher != null)
+              IconButton(
+                icon: const Icon(Icons.close, color: Colors.red),
+                onPressed: () {
+                  ref.read(checkoutProvider.notifier).selectVoucher(null);
+                },
+                tooltip: 'Bỏ chọn',
+              )
+            else
+              TextButton(
+                onPressed: () => _openVoucherModal(context, ref),
+                child: const Text('Chọn Voucher'),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _openVoucherModal(BuildContext context, WidgetRef ref) {
+    final codeController = TextEditingController();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) {
+        return Padding(
+          padding: EdgeInsets.only(
+            left: AppTheme.spaceM,
+            right: AppTheme.spaceM,
+            top: AppTheme.spaceM,
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + AppTheme.spaceM,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Chọn Voucher Ưu Đãi',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(ctx),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: codeController,
+                      decoration: const InputDecoration(
+                        hintText: 'Nhập mã voucher (vd: WELCOME10)',
+                        isDense: true,
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    onPressed: () async {
+                      final code = codeController.text.trim().toUpperCase();
+                      if (code.isEmpty) return;
+                      try {
+                        final repository = ref.read(adminRepositoryProvider);
+                        final vouchers = await repository.getVouchers();
+                        final match = vouchers.firstWhere(
+                          (v) => v.code.toUpperCase() == code && v.isActive,
+                          orElse: () => throw Exception(
+                            'Mã voucher không hợp lệ hoặc đã hết hạn',
+                          ),
+                        );
+                        if (subtotal < match.minOrder) {
+                          throw Exception(
+                            'Đơn hàng tối thiểu ${formatVnd(match.minOrder)} để áp dụng mã này',
+                          );
+                        }
+                        ref
+                            .read(checkoutProvider.notifier)
+                            .selectVoucher(match);
+                        if (ctx.mounted) Navigator.pop(ctx);
+                      } catch (e) {
+                        if (ctx.mounted) {
+                          ScaffoldMessenger.of(ctx).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                e.toString().replaceFirst('Exception: ', ''),
+                              ),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      }
+                    },
+                    child: const Text('Áp dụng'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Mã giảm giá có sẵn:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              FutureBuilder<List<Voucher>>(
+                future: ref.read(adminRepositoryProvider).getVouchers(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+                  final all = snapshot.data ?? [];
+                  final eligible = all.where((v) => v.isActive).toList();
+                  if (eligible.isEmpty) {
+                    return const Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Text('Hiện không có mã giảm giá nào khả dụng.'),
+                    );
+                  }
+                  return ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: eligible.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 8),
+                    itemBuilder: (context, index) {
+                      final v = eligible[index];
+                      final meetsMin = subtotal >= v.minOrder;
+                      return Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: meetsMin
+                                ? Colors.orange.shade300
+                                : Colors.grey.shade300,
+                          ),
+                          borderRadius: BorderRadius.circular(8),
+                          color: meetsMin
+                              ? Colors.orange.shade50
+                              : Colors.grey.shade100,
+                        ),
+                        child: ListTile(
+                          leading: Icon(
+                            Icons.local_offer,
+                            color: meetsMin ? Colors.orange : Colors.grey,
+                          ),
+                          title: Text(
+                            v.code,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Text(
+                            'Giảm ${formatVnd(v.discount)} · Đơn từ ${formatVnd(v.minOrder)}',
+                            style: TextStyle(
+                              color: meetsMin ? Colors.black87 : Colors.grey,
+                            ),
+                          ),
+                          trailing: ElevatedButton(
+                            onPressed: meetsMin
+                                ? () {
+                                    ref
+                                        .read(checkoutProvider.notifier)
+                                        .selectVoucher(v);
+                                    Navigator.pop(ctx);
+                                  }
+                                : null,
+                            child: const Text('Dùng mã'),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
 class _PaymentSection extends ConsumerWidget {
   final PaymentMethodType selected;
   const _PaymentSection({required this.selected});
@@ -276,25 +523,40 @@ class _PaymentSection extends ConsumerWidget {
 
 class _OrderSummary extends StatelessWidget {
   final double subtotal;
+  final double discount;
   final int itemCount;
 
-  const _OrderSummary({required this.subtotal, required this.itemCount});
+  const _OrderSummary({
+    required this.subtotal,
+    required this.discount,
+    required this.itemCount,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final finalTotal = math.max(0.0, subtotal - discount);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(AppTheme.spaceM),
         child: Column(
           children: [
             _row(context, 'Tạm tính ($itemCount sản phẩm)', formatVnd(subtotal)),
+            if (discount > 0) ...[
+              const SizedBox(height: AppTheme.spaceS),
+              _row(
+                context,
+                'Giảm giá (Voucher)',
+                '- ${formatVnd(discount)}',
+                valueColor: Colors.green,
+              ),
+            ],
             const SizedBox(height: AppTheme.spaceS),
-            _row(context, 'Phí vận chuyển', 'Tính khi xác nhận'),
+            _row(context, 'Phí vận chuyển', 'Tính khi nhận'),
             const Divider(height: AppTheme.spaceL),
             _row(
               context,
               'Tổng cộng',
-              formatVnd(subtotal),
+              formatVnd(finalTotal),
               emphasize: true,
             ),
           ],
@@ -308,6 +570,7 @@ class _OrderSummary extends StatelessWidget {
     String label,
     String value, {
     bool emphasize = false,
+    Color? valueColor,
   }) {
     final theme = Theme.of(context);
     final style = emphasize
@@ -315,7 +578,10 @@ class _OrderSummary extends StatelessWidget {
             fontWeight: FontWeight.bold,
             color: theme.colorScheme.primary,
           )
-        : theme.textTheme.bodyMedium;
+        : theme.textTheme.bodyMedium?.copyWith(
+            color: valueColor,
+            fontWeight: valueColor != null ? FontWeight.bold : null,
+          );
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [

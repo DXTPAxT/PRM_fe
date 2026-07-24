@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../shared/models/voucher.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../orders/data/models/order_detail.dart';
 import '../../../orders/presentation/providers/orders_provider.dart';
@@ -27,12 +28,14 @@ final checkoutDataSourceProvider = Provider<CheckoutRemoteDataSource>((ref) {
 class CheckoutState {
   final String? selectedAddressId;
   final PaymentMethodType paymentMethod;
+  final Voucher? selectedVoucher;
   final bool isSubmitting;
   final String? errorMessage;
 
   const CheckoutState({
     this.selectedAddressId,
     this.paymentMethod = PaymentMethodType.cod,
+    this.selectedVoucher,
     this.isSubmitting = false,
     this.errorMessage,
   });
@@ -40,6 +43,8 @@ class CheckoutState {
   CheckoutState copyWith({
     String? selectedAddressId,
     PaymentMethodType? paymentMethod,
+    Voucher? selectedVoucher,
+    bool clearVoucher = false,
     bool? isSubmitting,
     String? errorMessage,
     bool clearError = false,
@@ -47,6 +52,7 @@ class CheckoutState {
     return CheckoutState(
       selectedAddressId: selectedAddressId ?? this.selectedAddressId,
       paymentMethod: paymentMethod ?? this.paymentMethod,
+      selectedVoucher: clearVoucher ? null : selectedVoucher ?? this.selectedVoucher,
       isSubmitting: isSubmitting ?? this.isSubmitting,
       errorMessage: clearError ? null : errorMessage ?? this.errorMessage,
     );
@@ -85,6 +91,14 @@ class CheckoutNotifier extends StateNotifier<CheckoutState> {
     state = state.copyWith(paymentMethod: method);
   }
 
+  void selectVoucher(Voucher? voucher) {
+    if (voucher == null) {
+      state = state.copyWith(clearVoucher: true);
+    } else {
+      state = state.copyWith(selectedVoucher: voucher);
+    }
+  }
+
   /// Tạo đơn. Trả về PlaceOrderResult nếu thành công, null nếu lỗi
   /// (errorMessage đã được set).
   Future<PlaceOrderResult?> placeOrder() async {
@@ -99,6 +113,7 @@ class CheckoutNotifier extends StateNotifier<CheckoutState> {
       final order = await _ref.read(ordersRepositoryProvider).createOrder(
             addressId: addressId,
             paymentMethod: state.paymentMethod.value,
+            voucherId: state.selectedVoucher?.id,
           );
 
       state = state.copyWith(isSubmitting: false);
