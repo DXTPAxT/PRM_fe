@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/utils/password_validator.dart';
 import '../providers/auth_provider.dart';
 
 class ResetPasswordScreen extends ConsumerStatefulWidget {
   const ResetPasswordScreen({super.key});
 
   @override
-  ConsumerState<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
+  ConsumerState<ResetPasswordScreen> createState() =>
+      _ResetPasswordScreenState();
 }
 
 class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
@@ -30,34 +32,36 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
     super.dispose();
   }
 
-  void _submit() {
-    if (_formKey.currentState!.validate()) {
-      ref.read(authProvider.notifier).resetPassword(
-            _emailController.text.trim(),
-            _otpController.text.trim(),
-            _passwordController.text,
-          );
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    FocusScope.of(context).unfocus();
+    final result = await ref
+        .read(authProvider.notifier)
+        .resetPassword(
+          _emailController.text.trim(),
+          _otpController.text.trim(),
+          _passwordController.text,
+        );
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(result.message),
+          backgroundColor: result.isSuccess ? Colors.green : Colors.red,
+        ),
+      );
+
+    if (result.isSuccess) {
+      context.go('/login');
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
-
-    ref.listen<AuthState>(authProvider, (previous, next) {
-      if (next.errorMessage != null && next.errorMessage!.isNotEmpty) {
-        final isSuccess = next.errorMessage!.contains('thành công');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.errorMessage!),
-            backgroundColor: isSuccess ? Colors.green : Colors.red,
-          ),
-        );
-        if (isSuccess) {
-          context.go('/login');
-        }
-      }
-    });
 
     return Scaffold(
       appBar: AppBar(title: const Text('Đặt lại mật khẩu')),
@@ -103,7 +107,8 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                   prefixIcon: Icon(Icons.pin_outlined),
                 ),
                 validator: (value) {
-                  return value != null && RegExp(r'^\d{6}$').hasMatch(value.trim())
+                  return value != null &&
+                          RegExp(r'^\d{6}$').hasMatch(value.trim())
                       ? null
                       : 'OTP phải gồm đúng 6 chữ số';
                 },
@@ -117,15 +122,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                   hintText: 'Nhập mật khẩu mới',
                   prefixIcon: Icon(Icons.lock_outline),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Vui lòng nhập mật khẩu';
-                  }
-                  if (value.length < 8) {
-                    return 'Mật khẩu phải từ 8 ký tự trở lên';
-                  }
-                  return null;
-                },
+                validator: validateStrongPassword,
               ),
               const SizedBox(height: 32),
               if (authState.isLoading)

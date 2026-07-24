@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/utils/password_validator.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../../shared/models/user.dart';
 
@@ -325,9 +326,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   labelText: 'Mật khẩu mới',
                   prefixIcon: Icon(Icons.lock_reset_outlined),
                 ),
-                validator: (value) => value == null || value.length < 8
-                    ? 'Mật khẩu mới phải từ 8 ký tự'
-                    : null,
+                validator: validateStrongPassword,
               ),
               const SizedBox(height: 12),
               TextFormField(

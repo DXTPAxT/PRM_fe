@@ -7,7 +7,8 @@ class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
 
   @override
-  ConsumerState<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+  ConsumerState<ForgotPasswordScreen> createState() =>
+      _ForgotPasswordScreenState();
 }
 
 class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
@@ -20,31 +21,33 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     super.dispose();
   }
 
-  void _submit() {
-    if (_formKey.currentState!.validate()) {
-      ref.read(authProvider.notifier).forgotPassword(_emailController.text.trim());
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    FocusScope.of(context).unfocus();
+    final result = await ref
+        .read(authProvider.notifier)
+        .forgotPassword(_emailController.text.trim());
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(result.message),
+          backgroundColor: result.isSuccess ? Colors.green : Colors.red,
+        ),
+      );
+
+    if (result.isSuccess) {
+      // OTP reset is verified together with the new password.
+      context.push('/reset-password');
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
-
-    ref.listen<AuthState>(authProvider, (previous, next) {
-      if (next.errorMessage != null && next.errorMessage!.isNotEmpty) {
-        final isSuccess = next.errorMessage!.contains('OTP');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.errorMessage!),
-            backgroundColor: isSuccess ? Colors.green : Colors.red,
-          ),
-        );
-        if (isSuccess) {
-          // OTP reset is verified together with the new password.
-          context.push('/reset-password');
-        }
-      }
-    });
 
     return Scaffold(
       appBar: AppBar(title: const Text('Quên mật khẩu')),
@@ -77,7 +80,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                   if (value == null || value.trim().isEmpty) {
                     return 'Vui lòng nhập email';
                   }
-                  if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                  if (!RegExp(
+                    r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                  ).hasMatch(value)) {
                     return 'Email không hợp lệ';
                   }
                   return null;
