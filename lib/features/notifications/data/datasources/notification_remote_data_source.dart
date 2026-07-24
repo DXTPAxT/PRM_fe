@@ -1,4 +1,3 @@
-import '../../../../core/network/api_response.dart';
 import '../../../../core/network/dio_client.dart';
 import '../models/notification_item.dart';
 
@@ -7,7 +6,10 @@ class NotificationRemoteDataSource {
 
   NotificationRemoteDataSource(this._dioClient);
 
-  Future<Map<String, dynamic>> getNotifications({int page = 1, int limit = 20}) async {
+  Future<Map<String, dynamic>> getNotifications({
+    int page = 1,
+    int limit = 20,
+  }) async {
     final response = await _dioClient.get(
       '/notifications',
       queryParameters: {'page': page, 'limit': limit},
