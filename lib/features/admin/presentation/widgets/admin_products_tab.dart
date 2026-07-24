@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../shared/models/product.dart';
+import '../../../catalog/presentation/providers/catalog_provider.dart';
 import '../providers/admin_provider.dart';
 
 class AdminProductsTab extends ConsumerStatefulWidget {
@@ -14,9 +15,10 @@ class _AdminProductsTabState extends ConsumerState<AdminProductsTab> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(
-      () => ref.read(adminProductsProvider.notifier).loadProducts(),
-    );
+    Future.microtask(() {
+      ref.read(adminProductsProvider.notifier).loadProducts();
+      ref.read(catalogProvider.notifier).loadInitial();
+    });
   }
 
   @override
@@ -37,7 +39,7 @@ class _AdminProductsTabState extends ConsumerState<AdminProductsTab> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (state.error != null) {
+    if (state.error != null && state.products.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -101,63 +103,128 @@ class _AdminProductsTabState extends ConsumerState<AdminProductsTab> {
     final nameController = TextEditingController();
     final priceController = TextEditingController();
     final descController = TextEditingController();
+    final categories = ref.read(catalogProvider).categories;
+
+    String? selectedCategoryId = categories.isNotEmpty ? categories.first.id : null;
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Tạo sản phẩm mới'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Tên sản phẩm',
-                  hintText: 'Nhập tên sản phẩm',
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: const Text('Tạo sản phẩm mới'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: nameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Tên sản phẩm',
+                    hintText: 'Nhập tên sản phẩm',
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: priceController,
-                decoration: const InputDecoration(
-                  labelText: 'Giá (VNĐ)',
-                  hintText: 'Nhập giá sản phẩm',
+                const SizedBox(height: 16),
+                TextField(
+                  controller: priceController,
+                  decoration: const InputDecoration(
+                    labelText: 'Giá (VNĐ)',
+                    hintText: 'Nhập giá sản phẩm',
+                  ),
+                  keyboardType: TextInputType.number,
                 ),
-                keyboardType: TextInputType.number,
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: descController,
-                decoration: const InputDecoration(
-                  labelText: 'Mô tả',
-                  hintText: 'Nhập mô tả sản phẩm',
+                const SizedBox(height: 16),
+                if (categories.isNotEmpty)
+                  DropdownButtonFormField<String>(
+                    initialValue: selectedCategoryId,
+                    decoration: const InputDecoration(labelText: 'Danh mục'),
+                    items: categories
+                        .map(
+                          (c) => DropdownMenuItem(
+                            value: c.id,
+                            child: Text(c.name),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (val) {
+                      setDialogState(() {
+                        selectedCategoryId = val;
+                      });
+                    },
+                  ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: descController,
+                  decoration: const InputDecoration(
+                    labelText: 'Mô tả',
+                    hintText: 'Nhập mô tả sản phẩm',
+                  ),
+                  maxLines: 3,
                 ),
-                maxLines: 3,
-              ),
-            ],
+              ],
+            ),
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Hủy'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                if (nameController.text.trim().isNotEmpty &&
+                    priceController.text.trim().isNotEmpty) {
+                  final price = double.tryParse(priceController.text.trim()) ?? 0;
+                  final categoryId = selectedCategoryId ?? (categories.isNotEmpty ? categories.first.id : '');
+
+                  if (categoryId.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Vui lòng chọn danh mục cho sản phẩm')),
+                    );
+                    return;
+                  }
+
+                  final payload = {
+                    'categoryId': categoryId,
+                    'name': nameController.text.trim(),
+                    'basePrice': price,
+                    'description': descController.text.trim(),
+                    'variants': [
+                      {
+                        'size': 'F',
+                        'color': 'Mặc định',
+                        'price': price,
+                        'stockQty': 100,
+                        'sku': 'SKU-${DateTime.now().millisecondsSinceEpoch}',
+                      }
+                    ],
+                  };
+
+                  Navigator.pop(ctx);
+                  final success = await ref
+                      .read(adminProductsProvider.notifier)
+                      .createProduct(payload);
+
+                  if (context.mounted) {
+                    if (success) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Tạo sản phẩm mới thành công')),
+                      );
+                    } else {
+                      final error = ref.read(adminProductsProvider).error ?? 'Tạo thất bại';
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Lỗi: $error'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      ref.read(adminProductsProvider.notifier).clearError();
+                    }
+                  }
+                }
+              },
+              child: const Text('Tạo'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Hủy'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (nameController.text.isNotEmpty &&
-                  priceController.text.isNotEmpty) {
-                ref.read(adminProductsProvider.notifier).createProduct({
-                  'name': nameController.text,
-                  'price': double.tryParse(priceController.text) ?? 0,
-                  'description': descController.text,
-                });
-                Navigator.pop(ctx);
-              }
-            },
-            child: const Text('Tạo'),
-          ),
-        ],
       ),
     );
   }
@@ -165,65 +232,118 @@ class _AdminProductsTabState extends ConsumerState<AdminProductsTab> {
   void _showEditProductDialog(BuildContext context, Product product) {
     final nameController = TextEditingController(text: product.name);
     final priceController =
-        TextEditingController(text: product.basePrice.toString());
+        TextEditingController(text: product.basePrice.toStringAsFixed(0));
     final descController =
-        TextEditingController(text: product.description);
+        TextEditingController(text: product.description ?? '');
+    final categories = ref.read(catalogProvider).categories;
+
+    String? selectedCategoryId = product.categoryId.isNotEmpty
+        ? product.categoryId
+        : (categories.isNotEmpty ? categories.first.id : null);
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Chỉnh sửa sản phẩm'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Tên sản phẩm',
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: const Text('Chỉnh sửa sản phẩm'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: nameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Tên sản phẩm',
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: priceController,
-                decoration: const InputDecoration(
-                  labelText: 'Giá (VNĐ)',
+                const SizedBox(height: 16),
+                TextField(
+                  controller: priceController,
+                  decoration: const InputDecoration(
+                    labelText: 'Giá (VNĐ)',
+                  ),
+                  keyboardType: TextInputType.number,
                 ),
-                keyboardType: TextInputType.number,
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: descController,
-                decoration: const InputDecoration(
-                  labelText: 'Mô tả',
+                const SizedBox(height: 16),
+                if (categories.isNotEmpty)
+                  DropdownButtonFormField<String>(
+                    initialValue: categories.any((c) => c.id == selectedCategoryId)
+                        ? selectedCategoryId
+                        : null,
+                    decoration: const InputDecoration(labelText: 'Danh mục'),
+                    items: categories
+                        .map(
+                          (c) => DropdownMenuItem(
+                            value: c.id,
+                            child: Text(c.name),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (val) {
+                      setDialogState(() {
+                        selectedCategoryId = val;
+                      });
+                    },
+                  ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: descController,
+                  decoration: const InputDecoration(
+                    labelText: 'Mô tả',
+                  ),
+                  maxLines: 3,
                 ),
-                maxLines: 3,
-              ),
-            ],
+              ],
+            ),
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Hủy'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                if (nameController.text.trim().isNotEmpty &&
+                    priceController.text.trim().isNotEmpty) {
+                  final price = double.tryParse(priceController.text.trim()) ?? product.basePrice;
+
+                  final payload = <String, dynamic>{
+                    'name': nameController.text.trim(),
+                    'basePrice': price,
+                    'description': descController.text.trim(),
+                  };
+
+                  if (selectedCategoryId != null && selectedCategoryId!.isNotEmpty) {
+                    payload['categoryId'] = selectedCategoryId;
+                  }
+
+                  Navigator.pop(ctx);
+                  final success = await ref
+                      .read(adminProductsProvider.notifier)
+                      .updateProduct(product.id, payload);
+
+                  if (context.mounted) {
+                    if (success) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Cập nhật sản phẩm thành công')),
+                      );
+                    } else {
+                      final error = ref.read(adminProductsProvider).error ?? 'Cập nhật thất bại';
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Lỗi: $error'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      ref.read(adminProductsProvider.notifier).clearError();
+                    }
+                  }
+                }
+              },
+              child: const Text('Cập nhật'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Hủy'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (nameController.text.isNotEmpty &&
-                  priceController.text.isNotEmpty) {
-                ref
-                    .read(adminProductsProvider.notifier)
-                    .updateProduct(product.id, {
-                  'name': nameController.text,
-                  'price': double.tryParse(priceController.text) ?? 0,
-                  'description': descController.text,
-                });
-                Navigator.pop(ctx);
-              }
-            },
-            child: const Text('Cập nhật'),
-          ),
-        ],
       ),
     );
   }
@@ -240,11 +360,28 @@ class _AdminProductsTabState extends ConsumerState<AdminProductsTab> {
             child: const Text('Hủy'),
           ),
           ElevatedButton(
-            onPressed: () {
-              ref
+            onPressed: () async {
+              Navigator.pop(ctx);
+              final success = await ref
                   .read(adminProductsProvider.notifier)
                   .deleteProduct(productId);
-              Navigator.pop(ctx);
+
+              if (context.mounted) {
+                if (success) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Đã ngừng bán sản phẩm thành công')),
+                  );
+                } else {
+                  final error = ref.read(adminProductsProvider).error ?? 'Xóa thất bại';
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Lỗi: $error'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  ref.read(adminProductsProvider.notifier).clearError();
+                }
+              }
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             child: const Text('Xóa'),

@@ -138,38 +138,56 @@ class AdminProductsNotifier extends StateNotifier<AdminProductsState> {
       final products = await repository.getProducts();
       state = AdminProductsState(products: products);
     } catch (e) {
-      state = AdminProductsState(error: e.toString());
+      state = AdminProductsState(
+        error: e.toString().replaceFirst('Exception: ', ''),
+      );
     }
   }
 
-  Future<void> createProduct(Map<String, dynamic> data) async {
+  Future<bool> createProduct(Map<String, dynamic> data) async {
     try {
       final repository = _ref.read(adminRepositoryProvider);
       await repository.createProduct(data);
-      await loadProducts(); // Reload products
+      await loadProducts();
+      return true;
     } catch (e) {
-      state = AdminProductsState(products: state.products, error: e.toString());
+      final msg = e.toString().replaceFirst('Exception: ', '');
+      state = AdminProductsState(products: state.products, error: msg);
+      return false;
     }
   }
 
-  Future<void> updateProduct(String id, Map<String, dynamic> data) async {
+  Future<bool> updateProduct(String id, Map<String, dynamic> data) async {
     try {
       final repository = _ref.read(adminRepositoryProvider);
       await repository.updateProduct(id, data);
-      await loadProducts(); // Reload products
+      await loadProducts();
+      return true;
     } catch (e) {
-      state = AdminProductsState(products: state.products, error: e.toString());
+      final msg = e.toString().replaceFirst('Exception: ', '');
+      state = AdminProductsState(products: state.products, error: msg);
+      return false;
     }
   }
 
-  Future<void> deleteProduct(String id) async {
+  Future<bool> deleteProduct(String id) async {
     try {
       final repository = _ref.read(adminRepositoryProvider);
       await repository.deleteProduct(id);
-      await loadProducts(); // Reload products
+      await loadProducts();
+      return true;
     } catch (e) {
-      state = AdminProductsState(products: state.products, error: e.toString());
+      final msg = e.toString().replaceFirst('Exception: ', '');
+      state = AdminProductsState(products: state.products, error: msg);
+      return false;
     }
+  }
+
+  void clearError() {
+    state = AdminProductsState(
+      products: state.products,
+      isLoading: state.isLoading,
+    );
   }
 }
 
