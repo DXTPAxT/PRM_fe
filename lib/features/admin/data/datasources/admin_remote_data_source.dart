@@ -112,7 +112,7 @@ class AdminRemoteDataSource {
   }
 
   Future<ApiResponse<Voucher>> updateVoucher(String id, Map<String, dynamic> data) async {
-    final response = await _dioClient.patch('/vouchers/$id', data: data);
+    final response = await _dioClient.put('/vouchers/$id', data: data);
     return ApiResponse<Voucher>.fromJson(
       response.data as Map<String, dynamic>,
       (json) => Voucher.fromJson(json as Map<String, dynamic>),

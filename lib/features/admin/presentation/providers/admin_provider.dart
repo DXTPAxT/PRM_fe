@@ -282,37 +282,55 @@ class AdminVouchersNotifier extends StateNotifier<AdminVouchersState> {
       final vouchers = await repository.getVouchers();
       state = AdminVouchersState(vouchers: vouchers);
     } catch (e) {
-      state = AdminVouchersState(error: e.toString());
+      state = AdminVouchersState(
+        error: e.toString().replaceFirst('Exception: ', ''),
+      );
     }
   }
 
-  Future<void> createVoucher(Map<String, dynamic> data) async {
+  Future<bool> createVoucher(Map<String, dynamic> data) async {
     try {
       final repository = _ref.read(adminRepositoryProvider);
       await repository.createVoucher(data);
-      await loadVouchers(); // Reload vouchers
+      await loadVouchers();
+      return true;
     } catch (e) {
-      state = AdminVouchersState(vouchers: state.vouchers, error: e.toString());
+      final msg = e.toString().replaceFirst('Exception: ', '');
+      state = AdminVouchersState(vouchers: state.vouchers, error: msg);
+      return false;
     }
   }
 
-  Future<void> updateVoucher(String id, Map<String, dynamic> data) async {
+  Future<bool> updateVoucher(String id, Map<String, dynamic> data) async {
     try {
       final repository = _ref.read(adminRepositoryProvider);
       await repository.updateVoucher(id, data);
-      await loadVouchers(); // Reload vouchers
+      await loadVouchers();
+      return true;
     } catch (e) {
-      state = AdminVouchersState(vouchers: state.vouchers, error: e.toString());
+      final msg = e.toString().replaceFirst('Exception: ', '');
+      state = AdminVouchersState(vouchers: state.vouchers, error: msg);
+      return false;
     }
   }
 
-  Future<void> deleteVoucher(String id) async {
+  Future<bool> deleteVoucher(String id) async {
     try {
       final repository = _ref.read(adminRepositoryProvider);
       await repository.deleteVoucher(id);
-      await loadVouchers(); // Reload vouchers
+      await loadVouchers();
+      return true;
     } catch (e) {
-      state = AdminVouchersState(vouchers: state.vouchers, error: e.toString());
+      final msg = e.toString().replaceFirst('Exception: ', '');
+      state = AdminVouchersState(vouchers: state.vouchers, error: msg);
+      return false;
     }
+  }
+
+  void clearError() {
+    state = AdminVouchersState(
+      vouchers: state.vouchers,
+      isLoading: state.isLoading,
+    );
   }
 }
